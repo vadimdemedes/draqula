@@ -1,0 +1,112 @@
+{
+	"name": "draqula",
+	"version": "0.0.0",
+	"main": "dist/index.js",
+	"module": "dist/draqula.esm.js",
+	"typings": "dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "rollup -c",
+		"dev": "rollup -cw",
+		"test": "npm run build && xo && ava"
+	},
+	"peerDependencies": {
+		"react": ">=16",
+		"graphql": ">=14"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "pretty-quick --staged"
+		}
+	},
+	"prettier": {
+		"printWidth": 120,
+		"semi": true,
+		"singleQuote": true,
+		"trailingComma": "none",
+		"useTabs": true,
+		"bracketSpacing": false
+	},
+	"dependencies": {
+		"@sindresorhus/fnv1a": "^1.2.0",
+		"@types/graphql": "^14.2.3",
+		"abort-controller": "^3.0.0",
+		"dependency-graph": "^0.8.0",
+		"emittery": "^0.4.1",
+		"ky": "^0.12.0",
+		"ky-universal": "^0.3.0",
+		"lodash": "^4.17.15",
+		"p-retry": "^4.1.0"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.5.5",
+		"@babel/preset-react": "^7.0.0",
+		"@testing-library/react-hooks": "^2.0.1",
+		"@types/lodash": "^4.14.137",
+		"@types/react": "^16.9.2",
+		"@typescript-eslint/eslint-plugin": "^2.0.0",
+		"@typescript-eslint/parser": "^2.0.0",
+		"ava": "^2.3.0",
+		"babel-plugin-lodash": "^3.3.4",
+		"eslint-config-xo-react": "^0.20.0",
+		"eslint-config-xo-typescript": "^0.17.0",
+		"eslint-plugin-react": "^7.14.3",
+		"eslint-plugin-react-hooks": "^2.0.1",
+		"graphql-tag": "^2.10.1",
+		"husky": "^3.0.4",
+		"nock": "^10.0.6",
+		"prettier": "^1.18.2",
+		"pretty-quick": "^1.11.1",
+		"react": "^16.9.0",
+		"react-test-renderer": "^16.9.0",
+		"rollup": "^1.19.4",
+		"rollup-plugin-babel": "^4.3.3",
+		"rollup-plugin-typescript2": "^0.22.1",
+		"typescript": "^3.5.3",
+		"xo": "^0.24.0"
+	},
+	"ava": {
+		"serial": true,
+		"babel": {
+			"testOptions": {
+				"presets": [
+					"@babel/preset-react"
+				]
+			}
+		}
+	},
+	"xo": {
+		"extends": [
+			"xo-react",
+			"xo-typescript"
+		],
+		"extensions": [
+			"ts",
+			"tsx",
+			"js"
+		],
+		"ignore": [
+			"rollup.config.js",
+			"test"
+		],
+		"rules": {
+			"unicorn/filename-case": 0,
+			"generator-star-spacing": 0,
+			"lines-between-class-members": 0,
+			"react/prop-types": 0,
+			"@typescript-eslint/promise-function-async": 0,
+			"@typescript-eslint/member-naming": 0,
+			"@typescript-eslint/no-explicit-any": 1,
+			"@typescript-eslint/member-ordering": 0,
+			"quotes": [
+				2,
+				"single",
+				{
+					"avoidEscape": true
+				}
+			]
+		}
+	}
+}
