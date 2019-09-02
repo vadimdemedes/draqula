@@ -1,34 +1,38 @@
 {
 	"name": "draqula",
 	"version": "0.0.0",
+	"description": "GraphQL client for React apps that don't need everything",
+	"license": "MIT",
+	"repository": "vadimdemedes/draqula",
+	"author": {
+		"name": "vdemedes",
+		"email": "vdemedes@gmail.com",
+		"url": "github.com/vadimdemedes"
+	},
 	"main": "dist/index.js",
 	"module": "dist/draqula.esm.js",
 	"typings": "dist/index.d.ts",
 	"files": [
 		"dist"
 	],
+	"engines": {
+		"node": ">=8"
+	},
 	"scripts": {
 		"build": "rollup -c",
 		"dev": "rollup -cw",
 		"test": "npm run build && xo && ava"
 	},
-	"peerDependencies": {
-		"react": ">=16",
-		"graphql": ">=14"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "pretty-quick --staged"
-		}
-	},
-	"prettier": {
-		"printWidth": 120,
-		"semi": true,
-		"singleQuote": true,
-		"trailingComma": "none",
-		"useTabs": true,
-		"bracketSpacing": false
-	},
+	"keywords": [
+		"react",
+		"graphql",
+		"gql",
+		"query",
+		"mutation",
+		"mutate",
+		"useQuery",
+		"useMutation"
+	],
 	"dependencies": {
 		"@sindresorhus/fnv1a": "^1.2.0",
 		"@types/graphql": "^14.2.3",
@@ -66,6 +70,18 @@
 		"rollup-plugin-typescript2": "^0.22.1",
 		"typescript": "^3.5.3",
 		"xo": "^0.24.0"
+	},
+	"peerDependencies": {
+		"react": ">=16",
+		"graphql": ">=14"
+	},
+	"prettier": {
+		"printWidth": 120,
+		"semi": true,
+		"singleQuote": true,
+		"trailingComma": "none",
+		"useTabs": true,
+		"bracketSpacing": false
 	},
 	"ava": {
 		"serial": true,
@@ -107,6 +123,11 @@
 					"avoidEscape": true
 				}
 			]
+		}
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "pretty-quick --staged"
 		}
 	}
 }
