@@ -1,0 +1,86 @@
+---
+path: /docs/getting-started
+position: 1
+---
+
+# Getting started
+
+I bet 5 zoo dollars that you'll get set up with Draqula in under a minute. Let's go.
+
+## Install
+
+```bash
+$ npm install draqula graphql graphql-tag
+```
+
+## Configure
+
+First, initialize Draqula with a full URL to your GraphQL endpoint:
+
+```js
+import {Draqula} from 'draqula';
+
+const client = new Draqula('https://my-graphql-server.com/graphql');
+```
+
+Next, make your client available to all React components in your app by using `DraqulaProvider`.
+Find a place where you call `render()` function provided by `react-dom` and modify it like this:
+
+```jsx
+import {Draqula, DraqulaProvider} from 'draqula';
+
+const client = new Draqula('https://my-graphql-server.com/graphql');
+
+// Before
+render(<MyApp />, document.body);
+
+// After
+render(
+	<DraqulaProvider client={client}>
+		<MyApp />
+	</DraqulaProvider>,
+	document.body
+);
+```
+
+Lastly, execute a GraphQL query in any of your components:
+
+```jsx
+import React from 'react';
+import {useQuery} from 'draqula';
+import gql from 'graphql-tag';
+
+const TODOS_QUERY = gql`
+	{
+		todos {
+			id
+			title
+		}
+	}
+`;
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	return (
+		<>
+			{loading && <span>Loading...</span>}
+			{error && <span>Oops, something went wrong!</span>}
+			{data && (
+				<ul>
+					{data.todos.map(todo => (
+						<li key={todo.id}>{todo.title}</li>
+					))}
+				</ul>
+			)}
+		</>
+	);
+};
+
+export default Todo;
+```
+
+This is an example query, of course, but at this point you can replace it with your own one.
+Your React app is ready to use Draqula!
+
+<NextPageLink to="/docs/queries">Queries</NextPageLink>

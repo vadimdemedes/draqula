@@ -1,0 +1,134 @@
+---
+path: /docs/error-handling
+position: 4
+---
+
+# Error handling
+
+You probably noticed that both `useQuery` and `useMutation` return an `error` parameter.
+This page is about how to handle it and different types of errors it represents.
+
+Draqula exposes 2 kinds of errors:
+
+- `NetworkError` - network or timeout errors
+- `GraphQLError` - errors originating from resolvers on the GraphQL server
+
+Technically there can also be JavaScript errors, like `SyntaxError` or `TypeError`.
+If you spot these, it means there's a bug in Draqula, so please [report it on GitHub](https://github.com/vadimdemedes/draqula/issues/new).
+
+Most of the time you won't need such granular error handling and checking for `error` existence should be enough for most use cases, but this functionality is still important to document, so here we go.
+
+## Network errors
+
+Network error can occur in many cases, like when request has timed out or server responded with 4xx/5xx HTTP status codes.
+Draqula wraps network and timeout errors into `NetworkError` for your convenience.
+However, the original error from [`ky-universal`](https://github.com/sindresorhus/ky-universal) (HTTP client that Draqula uses) can still be retrieved via `originalError` property.
+
+To detect network error, check if it's an instance of `NetworkError`:
+
+```js
+import {NetworkError} from 'draqula';
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	if (error instanceof NetworkError) {
+		// Network error!
+	}
+
+	// ...
+};
+```
+
+If you need more specific information about the error, you can import error types from [`ky-universal`] and check it:
+
+```js
+import {NetworkError} from 'draqula';
+import {HTTPError, TimeoutError} from 'ky-universal';
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	if (error instanceof NetworkError) {
+		if (error.originalError instanceof HTTPError) {
+			// Most likely a 4xx or 5xx status code
+		}
+
+		if (error.originalError instanceof TimeoutError) {
+			// Request has timed out
+		}
+	}
+
+	// ...
+};
+```
+
+## GraphQL errors
+
+`GraphQLError` is a pretty unusual error in JavaScript land, because it actually represents multiple errors at once.
+The reason for this custom functionality is that a single GraphQL request can respond with multiple errors at the same time.
+If Draqula didn't care about you as much, it would probably just expose this:
+
+```js
+const [data, loading, errors] = useQuery(...)
+```
+
+Then you'd have to check if `errors` array's `length` is more than zero and handle network and GraphQL errors manually.
+Thankfully, that's not the case.
+
+```js
+import {GraphQLError} from 'draqula';
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	if (error instanceof GraphQLError) {
+		// GraphQL error, resolvers failed!
+	}
+
+	// ...
+};
+```
+
+Remember, `GraphQLError` is a generic "bundle" error that contains multiple errors inside.
+So to display all of them, we need to convert it into an array and iterate it.
+
+```jsx
+import {GraphQLError} from 'draqula';
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	return (
+		<>
+			{error instanceof GraphQLError &&
+				error.toArray().map((graphqlError, index) => (
+					<div key={index} style={{color: 'red'}}>
+						{graphqlError.message}
+					</div>
+				))}
+		</>
+	);
+};
+```
+
+Alternatively, it's possible to iterate `error` itself with `for..of`.
+
+```js
+import {GraphQLError} from 'draqula';
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	if (error instanceof GraphQLError) {
+		for (const graphqlError of error) {
+			// Please don't actually alert error messages, it's for demo purposes only
+			alert(graphqlError.message);
+		}
+	}
+
+	// ...
+};
+```
+
+<NextPageLink to="/docs/request-hooks">Request hooks</NextPageLink>

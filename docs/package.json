@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "start": "npm run develop",
+    "serve": "gatsby serve"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "^1.4.0",
+    "@mdx-js/react": "^1.4.0",
+    "@sindresorhus/class-names": "^1.1.0",
+    "@sindresorhus/slugify": "^0.9.1",
+    "gatsby": "^2.13.73",
+    "prism-react-renderer": "^0.1.7",
+    "prop-types": "^15.7.2",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "trim-right": "^1.0.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.6.1",
+    "gatsby-plugin-mdx": "^1.0.35",
+    "gatsby-plugin-postcss": "^2.1.6",
+    "gatsby-source-filesystem": "^2.1.19",
+    "tailwindcss": "^1.1.2"
+  }
+}

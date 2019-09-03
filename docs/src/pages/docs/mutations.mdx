@@ -1,0 +1,273 @@
+---
+path: /docs/mutations
+position: 3
+---
+
+# Mutations
+
+Unlike queries, mutations in GraphQL are used to create, update or delete data.
+For this purpose, Draqula offers `useMutation` hook.
+Just like queries, remember to define your GraphQL queries **outside** your components to prevent infinite unnecessary rerenders.
+
+## Basic mutations
+
+Assuming server implements a `ping` mutation, that simply returns `"pong"` string, here's an example of the most basic mutation:
+
+```jsx
+const PING_MUTATION = gql`
+	mutation {
+		ping
+	}
+`;
+
+const PingPong = () => {
+	const [mutate] = useMutation(PING_MUTATION);
+
+	const onPing = async () => {
+		const data = await mutate();
+		// {
+		//   ping: 'pong'
+		// }
+	};
+
+	return <button onClick={onPing}>Ping</button>;
+};
+```
+
+Mutations without variables are not that useful, so let's add some variables to closer match the reality.
+
+## Variables
+
+Similar to `useQuery`, `useMutation` also accepts variables.
+The only difference is that you don't pass them to `useMutation` itself, but to the `mutate` function that it returns.
+
+```jsx
+const CREATE_TODO_MUTATION = gql`
+	mutation CreateTodo($title: String!) {
+		createTodo(title: $title) {
+			id
+			title
+		}
+	}
+`;
+
+const CreateTodo = () => {
+	const [title, setTitle] = useState('');
+	const [mutate] = useMutation(CREATE_TODO_MUTATION);
+
+	const onCreateTodo = async event => {
+		// Prevent form from refreshing the page
+		event.preventDefault();
+
+		try {
+			await mutate({title});
+
+			// Todo was successfully created
+		} catch (error) {
+			// Uh oh, something went wrong
+		}
+	};
+
+	return (
+		<form onSubmit={onCreateTodo}>
+			<input type="text" value={title} onChange={event => setTitle(event.target.value)} />
+			<br />
+			<button type="submit">Create Todo</button>
+		</form>
+	);
+};
+```
+
+## Caching
+
+When mutation succeeds, Draqula scans GraphQL types returned from that mutation and refetches all queries that use any of these types.
+For example, let's say we have the following GraphQL schema on our server:
+
+```gql
+type Query {
+	posts: [Post!]!
+	pages: [Page!]!
+}
+
+type Mutation {
+	createPost(title: String!): Post!
+}
+
+type Post {
+	title: String!
+}
+
+type Page {
+	title: String!
+}
+```
+
+Imagine we also have the following code for our page:
+
+```jsx
+const POSTS_QUERY = gql`
+	query {
+		posts {
+			title
+		}
+	}
+`;
+
+const PAGES_QUERY = gql`
+	query {
+		pages {
+			title
+		}
+	}
+`;
+
+const CREATE_POST_MUTATION = gql`
+	mutation CreatePost($title: String!) {
+		createPost(title: $title) {
+			title
+		}
+	}
+`;
+
+const Blog = () => {
+	const [posts] = useQuery(POSTS_QUERY);
+	const [pages] = useQuery(PAGES_QUERY);
+	const [createPost] = useMutation(CREATE_POST_MUTATION);
+
+	return (
+		<>
+			{/* ... */}
+			<button onClick={() => createPost({title: 'Stranger Things'})}>Create Post</button>
+		</>
+	);
+};
+```
+
+If user clicks "Create Post" button, `createPost` mutation will be executed, which returns only `Post` type.
+That tells Draqula to find all queries that contain `Post` type and refetch them.
+In that case, `POSTS_QUERY` is the only one that uses this type, so it will be refetched, while `PAGES_QUERY` will remain in the same state.
+
+## Refetch queries
+
+However, sometimes server uses the same data source, but returns it under various types.
+In that case, Draqula has no way to know that some query uses the same data under the hood and we need to help it find those queries to refetch.
+This is where `refetchQueries` option comes in.
+It's a list of queries to refetch in addition to the ones Draqula finds by itself.
+
+So if in theory, `PAGES_QUERY` needed to be refetched after `createPost` mutation, this is how it would work:
+
+```js
+const Blog = () => {
+	const [posts] = useQuery(POSTS_QUERY);
+	const [pages] = useQuery(PAGES_QUERY);
+	const [createPost] = useMutation(CREATE_POST_MUTATION, {
+		refetchQueries: [PAGES_QUERY]
+	});
+
+	// ...
+};
+```
+
+It's important to mention that by default `createPost` doesn't wait for queries to finish refetching.
+If this behavior is important for you, you can opt in for that via `waitForRefetchQueries` option:
+
+```js
+const Blog = () => {
+	const [posts] = useQuery(POSTS_QUERY);
+	const [pages] = useQuery(PAGES_QUERY);
+	const [createPost] = useMutation(CREATE_POST_MUTATION, {
+		refetchQueries: [PAGES_QUERY]
+	});
+
+	const onCreatePost = async () => {
+		try {
+			await createPost({title: 'Stranger Things'});
+
+			// Both POSTS_QUERY and PAGES_QUERY are refetched at this point
+		} catch (error) {
+			// ...
+		}
+	};
+
+	// ...
+};
+```
+
+## API
+
+### useMutation(query, options)
+
+#### query
+
+Type: `DocumentNode`
+
+Parsed GraphQL query via `gql` function from [`graphql-tag`](https://github.com/apollographql/graphql-tag) module.
+For example:
+
+```js
+const PING_MUTATION = gql`
+	mutation {
+		ping
+	}
+`;
+```
+
+#### options
+
+##### options.refetchQueries
+
+Type: `DocumentNode[]`<br/>
+Default: `[]`
+
+List of queries to refetch after mutation succeeds.
+
+##### options.waitForRefetchQueries
+
+Type: `boolean`<br/>
+Default: `false`
+
+Determines whether to wait for queries to refetch or complete the mutation immediately.
+
+`useMutation` hook returns an array of 4 items: `[mutate, data, loading, error]`
+
+#### mutate
+
+Type: `Function`
+
+Function that triggers a mutation.
+Accepts an optional object of variables to pass to mutation.
+Returns a promise that resolves when mutation is completed.
+
+```js
+const [mutate] = useMutation(CREATE_POST_MUTATION);
+
+const onCreatePost = async () => {
+	await mutate({
+		title: 'New Post'
+	});
+};
+```
+
+#### data
+
+Type: `object`<br/>
+Default: `null`
+
+Data returned from the query.
+
+#### loading
+
+Type: `boolean`<br/>
+Default: `false`
+
+Indicates whether mutation is currently in-flight.
+
+#### error
+
+Type: `NetworkError | GraphQLError`<br/>
+Default: `null`
+
+Error returned from the mutation request.
+Read more in the ["Error handling"](/docs/error-handling) section.
+
+<NextPageLink to="/docs/error-handling">Error handling</NextPageLink>

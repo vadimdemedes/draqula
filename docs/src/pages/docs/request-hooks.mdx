@@ -1,0 +1,53 @@
+---
+path: /docs/request-hooks
+position: 5
+---
+
+# Request hooks
+
+Request hooks are [hooks provided by `ky`](https://github.com/sindresorhus/ky#hooks).
+These hooks let you intercept request and response stage of the query or mutation and modify basically everything.
+
+## beforeRequest
+
+This hook allows you to modify request before it's sent to the server.
+It's commonly useful for adding an authorization token for your server or attaching a CSRF token.
+
+```js
+import {Draqula} from 'draqula';
+
+const authToken = 'super secret token';
+
+const client = new Draqula('https://graph.ql', {
+	hooks: {
+		beforeRequest: [
+			request => {
+				request.headers.set('authorization', `Bearer ${authToken}`);
+			}
+		]
+	}
+});
+```
+
+## afterResponse
+
+This hook lets you check or modify response before Draqula starts processing it.
+You could use `afterResponse` hooks to log requests, report errors to Sentry (or other error tracking service) or reauthenticate user with a fresh access token.
+
+```js
+import {Draqula} from 'draqula';
+
+const client = new Draqula('https://graph.ql', {
+	hooks: {
+		afterResponse: [
+			response => {
+				if (response.status === 500) {
+					alert('Server is down, check back later');
+				}
+			}
+		]
+	}
+});
+```
+
+Check out more examples in [ky's repository](https://github.com/sindresorhus/ky#hooksafterresponse).

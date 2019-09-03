@@ -1,0 +1,75 @@
+---
+path: /
+position: 0
+---
+
+# Introduction
+
+Draqula is a GraphQL client for React apps that don't need everything.
+It provides only the essential React hooks for building apps - queries ([`useQuery`](/docs/queries)) and mutations ([`useMutation`](/docs/mutations)), which is enough for the majority of web apps out there.
+It doesn't offer extensive cache mechanisms, local state management, higher-order or render-prop components.
+By skipping all of that, Draqula can maintain a small and simple codebase and focus on executing the basics well.
+
+If you need any of these, you can use [Apollo](https://www.apollographql.com/docs/react/) instead.
+
+Here's how Draqula looks and works:
+
+```jsx
+const TODOS_QUERY = gql`
+	{
+		todos {
+			id
+			title
+		}
+	}
+`;
+
+const Todos = () => {
+	const [data, loading, error] = useQuery(TODOS_QUERY);
+
+	return (
+		<>
+			{loading && <span>Loading...</span>}
+			{error && <span>Oops, something went wrong!</span>}
+			{data && (
+				<ul>
+					{data.todos.map(todo => (
+						<li key={todo.id}>{todo.title}</li>
+					))}
+				</ul>
+			)}
+		</>
+	);
+};
+```
+
+## Features
+
+- Simple API and codebase
+- Basic cache implementation with aggressive invalidation and refetching
+- Automatic retries of network/timeout errors and GraphQL queries
+- Keeps data in multiple tabs in sync
+- Straightforward way to hook into requests without a need for middleware
+
+## What is not supported?
+
+Here are the features that are planned to be implemented soon:
+
+- Server-side rendering
+- Polling of queries
+- Lazy queries (trigger a query on demand)
+- Pause queries if client is offline
+
+And here are the things that will not be implemented:
+
+- Higher-order components
+- Render-prop components
+- Subscriptions (at least not in the foreseeable future)
+- Caching implementation similar to the one in Apollo
+
+## Can I use Draqula in production?
+
+No, not yet. I would appreciate if you tested Draqula in your personal projects or experiments though!
+I want to give Draqula time to stabilize its API and fix any bugs that could come up to ensure that when 1.0 version is out, it's safe for production apps.
+
+<NextPageLink to="/docs/getting-started">Getting started</NextPageLink>
