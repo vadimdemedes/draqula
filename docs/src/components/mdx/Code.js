@@ -25,7 +25,7 @@ const Code = ({hasSpider, className, children}) => {
 		<div className="mb-6 relative">
 			<Highlight Prism={Prism} code={code} language={language} theme={theme}>
 				{({className, style, tokens, getLineProps, getTokenProps}) => (
-					<pre className={`${className} p-4 rounded mb-6`} style={{...style}}>
+					<pre className={`${className} p-4 rounded mb-6 overflow-auto`} style={{...style}}>
 						{tokens.map((line, index) => (
 							<div key={index} {...getLineProps({line, key: index})}>
 								<span className="text-gray-700 mr-4 select-none">{formatLineNumber(index + 1, tokens)}</span>
@@ -45,7 +45,9 @@ const Code = ({hasSpider, className, children}) => {
 				)}
 			</Highlight>
 
-			{hasSpider && <img src={spider} className="absolute" style={{bottom: -106, right: 0, width: 60}} alt="" />}
+			{hasSpider && (
+				<img src={spider} className="absolute hidden lg:block" style={{bottom: -106, right: 0, width: 60}} alt="" />
+			)}
 		</div>
 	);
 };

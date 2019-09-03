@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import NestedNavigationItem from './NestedNavigationItem';
 
 const NestedNavigation = ({parentPath, items}) => (
-	<ul className="block ml-4">
+	<ul className="hidden lg:block ml-4">
 		{items.map(item => (
 			<NestedNavigationItem key={item.url} title={item.title} path={parentPath + item.url} />
 		))}

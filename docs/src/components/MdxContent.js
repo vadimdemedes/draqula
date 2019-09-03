@@ -4,7 +4,7 @@ import {MDXProvider} from '@mdx-js/react';
 import * as mdxComponents from './mdx';
 
 const MdxContent = ({children}) => (
-	<main className="flex-1">
+	<main className="flex-1 min-w-0">
 		<MDXProvider components={mdxComponents}>{children}</MDXProvider>
 	</main>
 );
