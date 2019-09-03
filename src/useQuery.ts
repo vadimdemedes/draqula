@@ -107,8 +107,6 @@ export default <T>(
 
 					return fetchMoreOptions.merge<T>(data, nextData);
 				});
-			} catch (error) {
-				throw error;
 			} finally {
 				setFetchingMore(false);
 			}

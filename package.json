@@ -105,7 +105,8 @@
 		],
 		"ignore": [
 			"rollup.config.js",
-			"test"
+			"test",
+			"docs"
 		],
 		"rules": {
 			"unicorn/filename-case": 0,
