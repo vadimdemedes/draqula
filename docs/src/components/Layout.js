@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'gatsby';
+import {Helmet} from 'react-helmet';
 import Container from './Container';
 import TopNavigation from './TopNavigation';
 import DraqulaLogo from './DraqulaLogo';
@@ -13,8 +14,12 @@ import Sidebar from './Sidebar';
 import Navigation from './Navigation';
 import MdxContent from './MdxContent';
 
-const Layout = ({children}) => (
+const Layout = ({children, pageContext}) => (
 	<Container>
+		<Helmet>
+			<title>{pageContext.frontmatter.title} - Draqula</title>
+		</Helmet>
+
 		<TopNavigation>
 			<Link to="/">
 				<DraqulaLogo />

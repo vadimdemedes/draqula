@@ -16,6 +16,7 @@ const Navigation = () => {
 						id
 						tableOfContents(maxDepth: 2)
 						frontmatter {
+							title
 							path
 							position
 						}
@@ -30,7 +31,7 @@ const Navigation = () => {
 			{sortPages(data.allMdx.edges.map(edge => edge.node)).map(node => (
 				<NavigationItem
 					key={node.id}
-					title={node.tableOfContents.items[0].title}
+					title={node.frontmatter.title}
 					path={node.frontmatter.path}
 					tableOfContents={node.tableOfContents.items[0].items}
 				/>

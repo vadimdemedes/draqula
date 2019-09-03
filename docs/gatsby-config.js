@@ -18,6 +18,7 @@ module.exports = {
 				}
 			}
 		},
-		'gatsby-plugin-postcss'
+		'gatsby-plugin-postcss',
+		'gatsby-plugin-react-helmet'
 	]
 };
