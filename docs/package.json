@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^9.6.1",
+    "gatsby-plugin-fathom": "^1.1.0",
     "gatsby-plugin-mdx": "^1.0.35",
     "gatsby-plugin-postcss": "^2.1.6",
     "gatsby-plugin-purgecss": "^4.0.1",

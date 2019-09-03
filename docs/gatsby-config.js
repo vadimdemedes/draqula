@@ -27,6 +27,12 @@ module.exports = {
 				develop: true,
 				tailwind: true
 			}
+		},
+		{
+			resolve: 'gatsby-plugin-fathom',
+			options: {
+				siteId: 'OHXKQKPG'
+			}
 		}
 	]
 };
