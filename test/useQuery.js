@@ -713,6 +713,7 @@ test('fetch more', async t => {
 	});
 
 	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+	t.true(result.current[3].fetchingMore);
 
 	await waitForNextUpdate();
 
@@ -724,6 +725,7 @@ test('fetch more', async t => {
 		null
 	]);
 
+	t.false(result.current[3].fetchingMore);
 	t.true(nock.isDone());
 });
 

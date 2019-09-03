@@ -27,6 +27,7 @@ const defaultFetchMoreOptions = {merge: defaultMerge};
 interface QueryResultOptions {
 	refetch: () => Promise<void>;
 	fetchMore: (variables: object, options: FetchMoreOptions) => Promise<void>;
+	fetchingMore: boolean;
 }
 
 export default <T>(
@@ -39,6 +40,7 @@ export default <T>(
 	const [data, setData] = useState<T | null>(cachedData);
 	const [loading, setLoading] = useState(cachedData === null);
 	const [error, setError] = useState(null);
+	const [fetchingMore, setFetchingMore] = useState(false);
 
 	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
 		if (!refetch && cachedData === null) {
@@ -89,19 +91,27 @@ export default <T>(
 
 	const fetchMore = useCallback(
 		async (overrideVariables: object, fetchMoreOptions: FetchMoreOptions = defaultFetchMoreOptions): Promise<void> => {
-			const nextData = await client.query<T>(query, merge({}, variables, overrideVariables), options);
+			setFetchingMore(true);
 
-			setData(data => {
-				if (data === null) {
-					return nextData;
-				}
+			try {
+				const nextData = await client.query<T>(query, merge({}, variables, overrideVariables), options);
 
-				if (nextData === null) {
-					return data;
-				}
+				setData(data => {
+					if (data === null) {
+						return nextData;
+					}
 
-				return fetchMoreOptions.merge<T>(data, nextData);
-			});
+					if (nextData === null) {
+						return data;
+					}
+
+					return fetchMoreOptions.merge<T>(data, nextData);
+				});
+			} catch (error) {
+				throw error;
+			} finally {
+				setFetchingMore(false);
+			}
 		},
 		useDeepDependencies([client, query, variables, options])
 	);
@@ -119,5 +129,5 @@ export default <T>(
 
 	useEffect(() => client.watchQuery(query, refetch), [client, query, refetch]);
 
-	return [data, loading, error, {fetchMore, refetch}];
+	return [data, loading, error, {fetchMore, fetchingMore, refetch}];
 };
