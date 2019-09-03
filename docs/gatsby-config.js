@@ -19,6 +19,14 @@ module.exports = {
 			}
 		},
 		'gatsby-plugin-postcss',
-		'gatsby-plugin-react-helmet'
+		'gatsby-plugin-react-helmet',
+		{
+			resolve: 'gatsby-plugin-purgecss',
+			options: {
+				printRejected: false,
+				develop: true,
+				tailwind: true
+			}
+		}
 	]
 };
