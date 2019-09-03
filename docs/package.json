@@ -1,4 +1,5 @@
 {
+	"name": "draqula-docs",
   "private": true,
   "scripts": {
     "build": "gatsby build",

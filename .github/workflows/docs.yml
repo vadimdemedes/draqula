@@ -1,0 +1,23 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - docs/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Deploy to ZEIT
+        run: npx now --token=${ZEIT_TOKEN} --name=draqula-docs --target=production
+        working-directory: docs
+        env:
+          ZEIT_TOKEN: ${{ secrets.ZEIT_TOKEN }}
