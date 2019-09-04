@@ -1,4 +1,10 @@
-# Draqula
+<h1 align="center">
+	<br/>
+	<img src="media/hero.svg" width="512">
+	<br/>
+	<br/>
+	<br/>
+</h1>
 
 Draqula is a GraphQL client for React apps that don't need everything.
 Instead of offering tons of features like extensive caching mechanism, local state management, subscriptions and so on, Draqula focuses on executing the basics well - queries and mutations.
