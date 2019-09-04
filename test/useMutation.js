@@ -5,6 +5,8 @@ import nock from 'nock';
 import {renderHook, act} from '@testing-library/react-hooks';
 import {Draqula, DraqulaContext, GraphQLError, NetworkError, useQuery, useMutation} from '..';
 import createWrapper from './_create-wrapper';
+import assertMutation from './_assert-mutation';
+import assertQuery from './_assert-query';
 
 nock.disableNetConnect();
 
@@ -60,28 +62,36 @@ test('run mutation', async t => {
 		wrapper: createWrapper(client)
 	});
 
-	t.deepEqual(result.current.slice(1, 4), [null, false, null]);
+	assertMutation(t, result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
 
 	act(() => {
-		result.current[0]({
+		result.current.mutate({
 			title: 'A'
 		});
 	});
 
-	t.deepEqual(result.current.slice(1, 4), [null, true, null]);
+	assertMutation(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
 
-	t.deepEqual(result.current.slice(1, 4), [
-		{
+	assertMutation(t, result, {
+		data: {
 			createTodo: {
 				id: 'a',
 				title: 'A'
 			}
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	t.true(nock.isDone());
 });
@@ -169,30 +179,57 @@ test('refetch queries with the same types', async t => {
 	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 	const postsQuery = renderHook(() => useQuery(POSTS_QUERY), {wrapper});
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, false, null]);
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [null, true, null]);
-	t.deepEqual(postsQuery.result.current.slice(0, 3), [null, true, null]);
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, todosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await todosQuery.waitForNextUpdate();
 	await postsQuery.waitForNextUpdate();
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [firstTodos, false, null]);
-	t.deepEqual(postsQuery.result.current.slice(0, 3), [posts, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: firstTodos,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: posts,
+		isLoading: false,
+		error: null
+	});
 
 	act(() => {
-		mutation.result.current[0]({
+		mutation.result.current.mutate({
 			title: 'B'
 		});
 	});
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, true, null]);
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await mutation.waitForNextUpdate();
 	await todosQuery.waitForNextUpdate();
 	t.true(nock.isDone());
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [
-		{
+	assertMutation(t, mutation.result, {
+		data: {
 			createTodo: {
 				id: 'b',
 				title: 'B',
@@ -200,12 +237,21 @@ test('refetch queries with the same types', async t => {
 			},
 			__typename: 'RootMutation'
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [secondTodos, false, null]);
-	t.deepEqual(postsQuery.result.current.slice(0, 3), [posts, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: secondTodos,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: posts,
+		isLoading: false,
+		error: null
+	});
 });
 
 test('refetch queries with additional custom queries', async t => {
@@ -321,31 +367,58 @@ test('refetch queries with additional custom queries', async t => {
 	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 	const postsQuery = renderHook(() => useQuery(POSTS_QUERY), {wrapper});
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, false, null]);
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [null, true, null]);
-	t.deepEqual(postsQuery.result.current.slice(0, 3), [null, true, null]);
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, todosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await todosQuery.waitForNextUpdate();
 	await postsQuery.waitForNextUpdate();
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [firstTodos, false, null]);
-	t.deepEqual(postsQuery.result.current.slice(0, 3), [firstPosts, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: firstTodos,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: firstPosts,
+		isLoading: false,
+		error: null
+	});
 
 	act(() => {
-		mutation.result.current[0]({
+		mutation.result.current.mutate({
 			title: 'B'
 		});
 	});
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, true, null]);
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await mutation.waitForNextUpdate();
 	await todosQuery.waitForNextUpdate();
 	await postsQuery.waitForNextUpdate();
 	t.true(nock.isDone());
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [
-		{
+	assertMutation(t, mutation.result, {
+		data: {
 			createTodo: {
 				id: 'b',
 				title: 'B',
@@ -353,12 +426,21 @@ test('refetch queries with additional custom queries', async t => {
 			},
 			__typename: 'RootMutation'
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [secondTodos, false, null]);
-	t.deepEqual(postsQuery.result.current.slice(0, 3), [secondPosts, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: secondTodos,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: secondPosts,
+		isLoading: false,
+		error: null
+	});
 });
 
 test('do not wait until queries are refetched before completing mutation', async t => {
@@ -426,21 +508,40 @@ test('do not wait until queries are refetched before completing mutation', async
 	const mutation = renderHook(() => useMutation(CREATE_TODO_MUTATION), {wrapper});
 	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, false, null]);
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [null, true, null]);
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, todosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await todosQuery.waitForNextUpdate();
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [firstTodos, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: firstTodos,
+		isLoading: false,
+		error: null
+	});
 
-	await mutation.result.current[0]({
+	await mutation.result.current.mutate({
 		title: 'B'
 	});
 
 	t.false(nock.isDone());
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [firstTodos, false, null]);
-	t.deepEqual(mutation.result.current.slice(1, 4), [
-		{
+
+	assertQuery(t, todosQuery.result, {
+		data: firstTodos,
+		isLoading: false,
+		error: null
+	});
+
+	assertMutation(t, mutation.result, {
+		data: {
 			createTodo: {
 				id: 'b',
 				title: 'B',
@@ -448,13 +549,18 @@ test('do not wait until queries are refetched before completing mutation', async
 			},
 			__typename: 'RootMutation'
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	await todosQuery.waitForNextUpdate();
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [secondTodos, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: secondTodos,
+		isLoading: false,
+		error: null
+	});
+
 	t.true(nock.isDone());
 });
 
@@ -529,20 +635,34 @@ test('wait until queries are refetched before completing mutation', async t => {
 
 	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, false, null]);
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [null, true, null]);
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, todosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await todosQuery.waitForNextUpdate();
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [firstTodos, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: firstTodos,
+		isLoading: false,
+		error: null
+	});
 
-	await mutation.result.current[0]({
+	await mutation.result.current.mutate({
 		title: 'B'
 	});
 
 	t.true(nock.isDone());
-	t.deepEqual(mutation.result.current.slice(1, 4), [
-		{
+
+	assertMutation(t, mutation.result, {
+		data: {
 			createTodo: {
 				id: 'b',
 				title: 'B',
@@ -550,11 +670,15 @@ test('wait until queries are refetched before completing mutation', async t => {
 			},
 			__typename: 'RootMutation'
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
-	t.deepEqual(todosQuery.result.current.slice(0, 3), [secondTodos, false, null]);
+	assertQuery(t, todosQuery.result, {
+		data: secondTodos,
+		isLoading: false,
+		error: null
+	});
 });
 
 test('delete cache for refetched queries', async t => {
@@ -619,22 +743,39 @@ test('delete cache for refetched queries', async t => {
 
 	const wrapper = createWrapper(client);
 	const mutation = renderHook(() => useMutation(CREATE_TODO_MUTATION), {wrapper});
-	t.deepEqual(mutation.result.current.slice(1, 4), [null, false, null]);
+
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
 
 	const firstTodosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
-	t.deepEqual(firstTodosQuery.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, firstTodosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await firstTodosQuery.waitForNextUpdate();
-	t.deepEqual(firstTodosQuery.result.current.slice(0, 3), [firstTodos, false, null]);
+
+	assertQuery(t, firstTodosQuery.result, {
+		data: firstTodos,
+		isLoading: false,
+		error: null
+	});
+
 	firstTodosQuery.unmount();
 
-	await mutation.result.current[0]({
+	await mutation.result.current.mutate({
 		title: 'B'
 	});
 
 	t.false(nock.isDone());
-	t.deepEqual(mutation.result.current.slice(1, 4), [
-		{
+
+	assertMutation(t, mutation.result, {
+		data: {
 			createTodo: {
 				id: 'b',
 				title: 'B',
@@ -642,13 +783,23 @@ test('delete cache for refetched queries', async t => {
 			},
 			__typename: 'RootMutation'
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	const secondTodosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
-	t.deepEqual(secondTodosQuery.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, secondTodosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await secondTodosQuery.waitForNextUpdate();
-	t.deepEqual(secondTodosQuery.result.current.slice(0, 3), [secondTodos, false, null]);
+
+	assertQuery(t, secondTodosQuery.result, {
+		data: secondTodos,
+		isLoading: false,
+		error: null
+	});
 });

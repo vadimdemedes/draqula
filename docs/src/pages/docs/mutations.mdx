@@ -22,7 +22,7 @@ const PING_MUTATION = gql`
 `;
 
 const PingPong = () => {
-	const [mutate] = useMutation(PING_MUTATION);
+	const {mutate} = useMutation(PING_MUTATION);
 
 	const onPing = async () => {
 		const data = await mutate();
@@ -54,7 +54,7 @@ const CREATE_TODO_MUTATION = gql`
 
 const CreateTodo = () => {
 	const [title, setTitle] = useState('');
-	const [mutate] = useMutation(CREATE_TODO_MUTATION);
+	const {mutate} = useMutation(CREATE_TODO_MUTATION);
 
 	const onCreateTodo = async event => {
 		// Prevent form from refreshing the page
@@ -131,9 +131,9 @@ const CREATE_POST_MUTATION = gql`
 `;
 
 const Blog = () => {
-	const [posts] = useQuery(POSTS_QUERY);
-	const [pages] = useQuery(PAGES_QUERY);
-	const [createPost] = useMutation(CREATE_POST_MUTATION);
+	const {data: posts} = useQuery(POSTS_QUERY);
+	const {data: pages} = useQuery(PAGES_QUERY);
+	const {mutate: createPost} = useMutation(CREATE_POST_MUTATION);
 
 	return (
 		<>
@@ -159,9 +159,9 @@ So if in theory, `PAGES_QUERY` needed to be refetched after `createPost` mutatio
 
 ```js
 const Blog = () => {
-	const [posts] = useQuery(POSTS_QUERY);
-	const [pages] = useQuery(PAGES_QUERY);
-	const [createPost] = useMutation(CREATE_POST_MUTATION, {
+	const {data: posts} = useQuery(POSTS_QUERY);
+	const {data: pages} = useQuery(PAGES_QUERY);
+	const {mutate: createPost} = useMutation(CREATE_POST_MUTATION, {
 		refetchQueries: [PAGES_QUERY]
 	});
 
@@ -174,9 +174,9 @@ If this behavior is important for you, you can opt in for that via `waitForRefet
 
 ```js
 const Blog = () => {
-	const [posts] = useQuery(POSTS_QUERY);
-	const [pages] = useQuery(PAGES_QUERY);
-	const [createPost] = useMutation(CREATE_POST_MUTATION, {
+	const {data: posts} = useQuery(POSTS_QUERY);
+	const {data: pages} = useQuery(PAGES_QUERY);
+	const {mutate: createPost} = useMutation(CREATE_POST_MUTATION, {
 		refetchQueries: [PAGES_QUERY]
 	});
 
@@ -229,7 +229,7 @@ Default: `false`
 
 Determines whether to wait for queries to refetch or complete the mutation immediately.
 
-`useMutation` hook returns an array of 4 items: `[mutate, data, loading, error]`
+`useMutation` hook returns an object consisting of the following fields.
 
 #### mutate
 
@@ -240,7 +240,7 @@ Accepts an optional object of variables to pass to mutation.
 Returns a promise that resolves when mutation is completed.
 
 ```js
-const [mutate] = useMutation(CREATE_POST_MUTATION);
+const {mutate} = useMutation(CREATE_POST_MUTATION);
 
 const onCreatePost = async () => {
 	await mutate({
@@ -256,7 +256,7 @@ Default: `null`
 
 Data returned from the query.
 
-#### loading
+#### isLoading
 
 Type: `boolean`<br/>
 Default: `false`
@@ -265,7 +265,7 @@ Indicates whether mutation is currently in-flight.
 
 #### error
 
-Type: `NetworkError | GraphQLError`<br/>
+Type: `NetworkError | GraphQLError | null`<br/>
 Default: `null`
 
 Error returned from the mutation request.

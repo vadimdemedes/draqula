@@ -5,8 +5,8 @@ import ky, {Hooks, HTTPError, TimeoutError} from 'ky-universal';
 import pRetry from 'p-retry';
 import {uniq} from 'lodash';
 import hash from '@sindresorhus/fnv1a';
-import GraphQLError from './lib/GraphQLError';
-import NetworkError from './lib/NetworkError';
+import GraphQLError from './lib/graphql-error';
+import NetworkError from './lib/network-error';
 import addTypenames from './lib/add-typenames';
 import getTypenames from './lib/get-typenames';
 

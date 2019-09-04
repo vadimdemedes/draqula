@@ -5,6 +5,8 @@ import {merge} from 'lodash';
 import useDraqulaClient from './useDraqulaClient';
 import useDataCache from './useDataCache';
 import useDeepDependencies from './useDeepDependencies';
+import NetworkError from './lib/network-error';
+import GraphQLError from './lib/graphql-error';
 import defaultMerge from './lib/merge';
 
 interface QueryOptions {
@@ -24,27 +26,28 @@ interface FetchMoreOptions {
 
 const defaultFetchMoreOptions = {merge: defaultMerge};
 
-interface QueryResultOptions {
-	refetch: () => Promise<void>;
-	fetchMore: (variables: object, options: FetchMoreOptions) => Promise<void>;
-	fetchingMore: boolean;
-}
-
 export default <T>(
 	query: DocumentNode,
 	variables: object = {},
 	options: QueryOptions = {}
-): [T | null, boolean, Error | null, QueryResultOptions] => {
+): {
+	data: T | null;
+	isLoading: boolean;
+	error: NetworkError | GraphQLError | null;
+	refetch: () => Promise<void>;
+	fetchMore: (variables: object, options: FetchMoreOptions) => Promise<void>;
+	isFetchingMore: boolean;
+} => {
 	const client = useDraqulaClient();
 	const cachedData = useDataCache<T>(query, variables);
 	const [data, setData] = useState<T | null>(cachedData);
-	const [loading, setLoading] = useState(cachedData === null);
+	const [isLoading, setIsLoading] = useState(cachedData === null);
 	const [error, setError] = useState(null);
-	const [fetchingMore, setFetchingMore] = useState(false);
+	const [isFetchingMore, setFetchingMore] = useState(false);
 
 	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
 		if (!refetch && cachedData === null) {
-			setLoading(true);
+			setIsLoading(true);
 			setError(null);
 		}
 
@@ -56,7 +59,7 @@ export default <T>(
 
 			setData(data);
 			setError(null);
-			setLoading(false);
+			setIsLoading(false);
 		} catch (error) {
 			// `AbortError` is thrown when request is canceled
 			if (error.name === 'AbortError') {
@@ -69,7 +72,7 @@ export default <T>(
 
 			setData(null);
 			setError(error);
-			setLoading(false);
+			setIsLoading(false);
 		}
 	}, useDeepDependencies([client, query, variables, options, cachedData]));
 
@@ -115,7 +118,7 @@ export default <T>(
 	);
 
 	useEffect(() => {
-		setLoading(cachedData === null);
+		setIsLoading(cachedData === null);
 		setError(null);
 		setData(cachedData);
 
@@ -127,5 +130,5 @@ export default <T>(
 
 	useEffect(() => client.watchQuery(query, refetch), [client, query, refetch]);
 
-	return [data, loading, error, {fetchMore, fetchingMore, refetch}];
+	return {data, isLoading, error, fetchMore, isFetchingMore, refetch};
 };

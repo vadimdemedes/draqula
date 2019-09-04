@@ -26,12 +26,12 @@ const TODOS_QUERY = gql`
 `;
 
 const Todos = () => {
-	const [data, loading, error] = useQuery(TODOS_QUERY);
+	const {data, isLoading, error} = useQuery(TODOS_QUERY);
 
 	return (
 		<>
-			{loading && <span>Loading...</span>}
-			{error && <span>Oops, something went wrong!</span>}
+			{isLoading && <span>Loading…</span>}
+			{error && <span>Error: {error.message}</span>}
 			{data && (
 				<ul>
 					{data.todos.map(todo => (
@@ -48,8 +48,7 @@ const Todos = () => {
 
 - Simple API and codebase
 - Basic cache implementation with aggressive invalidation and refetching
-- Automatic retries of network/timeout errors and GraphQL queries
-- Keeps data in multiple tabs in sync
+- Automatic retries of network/timeout errors and failed GraphQL queries
 - Straightforward way to hook into requests without a need for middleware
 
 ## What is not supported?

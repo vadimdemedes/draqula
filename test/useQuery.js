@@ -5,6 +5,7 @@ import nock from 'nock';
 import {renderHook, act} from '@testing-library/react-hooks';
 import {Draqula, DraqulaContext, GraphQLError, NetworkError, useQuery, useMutation} from '..';
 import createWrapper from './_create-wrapper';
+import assertQuery from './_assert-query';
 
 nock.disableNetConnect();
 
@@ -49,12 +50,16 @@ test('query data', async t => {
 		});
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
 
-	t.deepEqual(result.current.slice(0, 3), [
-		{
+	assertQuery(t, result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -66,9 +71,9 @@ test('query data', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	t.true(nock.isDone());
 });
@@ -115,12 +120,17 @@ test('render cached data if possible and refetch', async t => {
 		});
 
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(firstRender.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, firstRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await firstRender.waitForNextUpdate();
 
-	t.deepEqual(firstRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, firstRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -132,16 +142,16 @@ test('render cached data if possible and refetch', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	firstRender.unmount();
 
 	const secondRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
-	t.deepEqual(secondRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, secondRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -153,14 +163,14 @@ test('render cached data if possible and refetch', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	await secondRender.waitForNextUpdate();
 
-	t.deepEqual(secondRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, secondRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -176,9 +186,9 @@ test('render cached data if possible and refetch', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	t.true(nock.isDone());
 });
@@ -227,12 +237,17 @@ test('disable cache for all queries', async t => {
 		});
 
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(firstRender.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, firstRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await firstRender.waitForNextUpdate();
 
-	t.deepEqual(firstRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, firstRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -244,19 +259,24 @@ test('disable cache for all queries', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	firstRender.unmount();
 
 	const secondRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(secondRender.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, secondRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await secondRender.waitForNextUpdate();
 
-	t.deepEqual(secondRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, secondRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -272,9 +292,9 @@ test('disable cache for all queries', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	t.true(nock.isDone());
 });
@@ -321,12 +341,17 @@ test('disable cache per query', async t => {
 		});
 
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY, {}, {cache: false}), {wrapper: createWrapper(client)});
-	t.deepEqual(firstRender.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, firstRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await firstRender.waitForNextUpdate();
 
-	t.deepEqual(firstRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, firstRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -338,21 +363,26 @@ test('disable cache per query', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	firstRender.unmount();
 
 	const secondRender = renderHook(() => useQuery(TODOS_QUERY, {}, {cache: false}), {
 		wrapper: createWrapper(client)
 	});
-	t.deepEqual(secondRender.result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, secondRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await secondRender.waitForNextUpdate();
 
-	t.deepEqual(secondRender.result.current.slice(0, 3), [
-		{
+	assertQuery(t, secondRender.result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -368,9 +398,9 @@ test('disable cache per query', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	t.true(nock.isDone());
 });
@@ -409,33 +439,17 @@ test('refetch on demand', async t => {
 		});
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
 
-	await waitForNextUpdate();
-
-	t.deepEqual(result.current.slice(0, 3), [
-		{
-			todos: [
-				{
-					id: 'a',
-					title: 'A'
-				},
-				{
-					id: 'b',
-					title: 'B'
-				}
-			]
-		},
-		false,
-		null
-	]);
-
-	act(() => {
-		result.current[3].refetch();
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [
-		{
+	await waitForNextUpdate();
+
+	assertQuery(t, result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -447,14 +461,35 @@ test('refetch on demand', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
+
+	act(() => {
+		result.current.refetch();
+	});
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
 
 	await waitForNextUpdate();
 
-	t.deepEqual(result.current.slice(0, 3), [
-		{
+	assertQuery(t, result, {
+		data: {
 			todos: [
 				{
 					id: 'a',
@@ -462,9 +497,9 @@ test('refetch on demand', async t => {
 				}
 			]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null
+	});
 
 	t.true(nock.isDone());
 });
@@ -525,18 +560,37 @@ test('fetch query with different variables', async t => {
 		wrapper: createWrapper(client)
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	page = 2;
 	rerender();
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
 
-	t.deepEqual(result.current.slice(0, 3), [secondPage, false, null]);
+	assertQuery(t, result, {
+		data: secondPage,
+		isLoading: false,
+		error: null
+	});
+
 	t.true(nock.isDone());
 });
 
@@ -618,31 +672,71 @@ test('cache data for different variables', async t => {
 		wrapper: createWrapper(client)
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	page = 2;
 	rerender();
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [secondPage, false, null]);
+
+	assertQuery(t, result, {
+		data: secondPage,
+		isLoading: false,
+		error: null
+	});
 
 	page = 1;
 	rerender();
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	page = 2;
 	rerender();
-	t.deepEqual(result.current.slice(0, 3), [secondPage, false, null]);
+
+	assertQuery(t, result, {
+		data: secondPage,
+		isLoading: false,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [secondPage, false, null]);
+
+	assertQuery(t, result, {
+		data: secondPage,
+		isLoading: false,
+		error: null
+	});
+
 	t.true(nock.isDone());
 });
 
@@ -701,31 +795,44 @@ test('fetch more', async t => {
 		wrapper: createWrapper(client)
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	act(() => {
-		result.current[3].fetchMore({
+		result.current.fetchMore({
 			page: 2
 		});
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
-	t.true(result.current[3].fetchingMore);
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null,
+		isFetchingMore: true
+	});
 
 	await waitForNextUpdate();
 
-	t.deepEqual(result.current.slice(0, 3), [
-		{
+	assertQuery(t, result, {
+		data: {
 			todos: [...firstPage.todos, ...secondPage.todos]
 		},
-		false,
-		null
-	]);
+		isLoading: false,
+		error: null,
+		isFetchingMore: false
+	});
 
-	t.false(result.current[3].fetchingMore);
 	t.true(nock.isDone());
 });
 
@@ -784,13 +891,22 @@ test('fetch more with custom merge function', async t => {
 		wrapper: createWrapper(client)
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	act(() => {
-		result.current[3].fetchMore(
+		result.current.fetchMore(
 			{
 				page: 2
 			},
@@ -800,10 +916,20 @@ test('fetch more with custom merge function', async t => {
 		);
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [firstPage, false, null]);
+	assertQuery(t, result, {
+		data: firstPage,
+		isLoading: false,
+		error: null
+	});
 
 	await waitForNextUpdate();
-	t.deepEqual(result.current.slice(0, 3), [secondPage, false, null]);
+
+	assertQuery(t, result, {
+		data: secondPage,
+		isLoading: false,
+		error: null
+	});
+
 	t.true(nock.isDone());
 });
 
@@ -825,16 +951,23 @@ test('handle GQL errors', async t => {
 		});
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof GraphQLError);
-	t.is(result.current[2].toArray().length, 2);
-	t.is(result.current[2].toArray()[0].message, 'Error 1');
-	t.is(result.current[2].toArray()[1].message, 'Error 2');
+
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof GraphQLError);
+	t.is(result.current.error.toArray().length, 2);
+	t.is(result.current.error.toArray()[0].message, 'Error 1');
+	t.is(result.current.error.toArray()[1].message, 'Error 2');
 	t.true(nock.isDone());
 });
 
@@ -857,16 +990,22 @@ test('do not retry failed requests', async t => {
 		});
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof GraphQLError);
-	t.is(result.current[2].toArray().length, 2);
-	t.is(result.current[2].toArray()[0].message, 'Error 1');
-	t.is(result.current[2].toArray()[1].message, 'Error 2');
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof GraphQLError);
+	t.is(result.current.error.toArray().length, 2);
+	t.is(result.current.error.toArray()[0].message, 'Error 1');
+	t.is(result.current.error.toArray()[1].message, 'Error 2');
 	t.true(nock.isDone());
 });
 
@@ -890,16 +1029,22 @@ test('retry failed requests N times', async t => {
 		});
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof GraphQLError);
-	t.is(result.current[2].toArray().length, 2);
-	t.is(result.current[2].toArray()[0].message, 'Error 1');
-	t.is(result.current[2].toArray()[1].message, 'Error 2');
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof GraphQLError);
+	t.is(result.current.error.toArray().length, 2);
+	t.is(result.current.error.toArray()[0].message, 'Error 1');
+	t.is(result.current.error.toArray()[1].message, 'Error 2');
 	t.true(nock.isDone());
 });
 
@@ -912,14 +1057,21 @@ test('handle network errors', async t => {
 		.reply(500);
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof NetworkError);
-	t.is(result.current[2].message, 'Internal Server Error');
+
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof NetworkError);
+	t.is(result.current.error.message, 'Internal Server Error');
 	t.true(nock.isDone());
 });
 
@@ -931,14 +1083,20 @@ test('do not retry 4xx responses', async t => {
 		.reply(400);
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof NetworkError);
-	t.is(result.current[2].message, 'Bad Request');
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof NetworkError);
+	t.is(result.current.error.message, 'Bad Request');
 	t.true(nock.isDone());
 });
 
@@ -954,14 +1112,20 @@ test('customize timeout for all queries', async t => {
 		.reply(500);
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof NetworkError);
-	t.is(result.current[2].message, 'Request timed out');
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof NetworkError);
+	t.is(result.current.error.message, 'Request timed out');
 	t.true(nock.isDone());
 });
 
@@ -978,13 +1142,18 @@ test('customize timeout per query', async t => {
 		wrapper: createWrapper(client)
 	});
 
-	t.deepEqual(result.current.slice(0, 3), [null, true, null]);
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current[0], null);
-	t.false(result.current[1]);
-	t.true(result.current[2] instanceof NetworkError);
-	t.is(result.current[2].message, 'Request timed out');
+	t.is(result.current.data, null);
+	t.false(result.current.isLoading);
+	t.true(result.current.error instanceof NetworkError);
+	t.is(result.current.error.message, 'Request timed out');
 	t.true(nock.isDone());
 });

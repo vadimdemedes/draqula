@@ -2,45 +2,52 @@ import {useState, useCallback} from 'react';
 import {DocumentNode} from 'graphql';
 import useDraqulaClient from './useDraqulaClient';
 import useDeepDependencies from './useDeepDependencies';
+import NetworkError from './lib/network-error';
+import GraphQLError from './lib/graphql-error';
 
-interface MutateOptions {
+interface MutationOptions {
 	readonly refetchQueries: DocumentNode[];
 	readonly waitForRefetchQueries: boolean;
 }
 
-const defaultMutateOptions = {
+const defaultMutationOptions = {
 	refetchQueries: [],
 	waitForRefetchQueries: false
 };
 
 export default <T>(
 	query: DocumentNode,
-	options: MutateOptions = defaultMutateOptions
-): [(variables?: object) => Promise<T | null>, T | null, boolean, Error | null] => {
+	options: MutationOptions = defaultMutationOptions
+): {
+	mutate: (variables?: object) => Promise<T | null>;
+	data: T | null;
+	isLoading: boolean;
+	error: NetworkError | GraphQLError | null;
+} => {
 	const client = useDraqulaClient();
 	const [data, setData] = useState<T | null>(null);
-	const [loading, setLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 
 	const mutate = useCallback(async (variables: object = {}): Promise<T | null> => {
 		setData(null);
 		setError(null);
-		setLoading(true);
+		setIsLoading(true);
 
 		try {
 			const data = await client.mutate<T>(query, variables, options);
 			setData(data);
 			setError(null);
-			setLoading(false);
+			setIsLoading(false);
 
 			return data;
 		} catch (error) {
 			setError(error);
-			setLoading(false);
+			setIsLoading(false);
 
 			throw error;
 		}
 	}, useDeepDependencies([client, query, options]));
 
-	return [mutate, data, loading, error];
+	return {mutate, data, isLoading, error};
 };

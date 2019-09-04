@@ -38,12 +38,12 @@ const TODOS_QUERY = gql`
 `;
 
 const Todos = () => {
-	const [data, loading, error] = useQuery(TODOS_QUERY);
+	const {data, isLoading, error} = useQuery(TODOS_QUERY);
 
 	return (
 		<>
-			{loading && <span>Loading...</span>}
-			{error && <span>Error!</span>}
+			{isLoading && <span>Loading...</span>}
+			{error && <span>Error: {error.message}</span>}
 			{data && (
 				<ul>
 					{data.todos.map(todo => (
