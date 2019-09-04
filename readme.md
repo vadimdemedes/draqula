@@ -47,7 +47,7 @@ const Todos = () => {
 	const {data, isLoading, error} = useQuery(TODOS_QUERY);
 
 	return (
-		<>
+		<div>
 			{isLoading && <span>Loading...</span>}
 			{error && <span>Error: {error.message}</span>}
 			{data && (
@@ -57,7 +57,7 @@ const Todos = () => {
 					))}
 				</ul>
 			)}
-		</>
+		<div/>
 	);
 };
 
