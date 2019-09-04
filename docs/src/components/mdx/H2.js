@@ -4,7 +4,7 @@ import slugify from '@sindresorhus/slugify';
 
 const H2 = ({children}) => (
 	<a href={`#${slugify(children)}`} id={slugify(children)}>
-		<h1 className="text-2xl font-medium underline mt-10">{children}</h1>
+		<h1 className="text-2xl font-medium underline mt-10 mb-2">{children}</h1>
 	</a>
 );
 

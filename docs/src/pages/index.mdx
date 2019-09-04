@@ -8,10 +8,11 @@ position: 0
 
 Draqula is a GraphQL client for React apps that don't need everything.
 It provides only the essential React hooks for building apps - queries ([`useQuery`](/docs/queries)) and mutations ([`useMutation`](/docs/mutations)), which is enough for the majority of web apps out there.
-It doesn't offer extensive cache mechanisms, local state management, higher-order or render-prop components.
+Draqula doesn't implement higher-order or render-prop components, hooks are the only way to work with Draqula.
+It also doesn't offer extensive cache mechanisms, local state management or subscriptions.
 By skipping all of that, Draqula can maintain a small and simple codebase and focus on executing the basics well.
 
-If you need any of these, you can use [Apollo](https://www.apollographql.com/docs/react/) instead.
+If you need any of the missing things, check out [Apollo](https://www.apollographql.com/docs/react/).
 
 Here's how Draqula looks and works:
 

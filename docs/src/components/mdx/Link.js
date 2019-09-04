@@ -5,7 +5,7 @@ import {Link as InternalLink} from 'gatsby';
 const Link = ({href, children}) => {
 	const className = 'text-blue-500 hover:underline';
 
-	if (href.startsWith('/')) {
+	if (href.startsWith('/') || href.startsWith('#')) {
 		return (
 			<InternalLink className={className} to={href}>
 				{children}

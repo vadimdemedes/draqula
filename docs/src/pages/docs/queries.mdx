@@ -6,7 +6,7 @@ position: 2
 
 # Queries
 
-Queries in Draqula are executed via `useQuery` React hook, exposed from `draqula` module:
+Queries in Draqula are executed via `useQuery` React hook, exposed from the `draqula` module:
 
 ```jsx
 import {useQuery} from 'draqula';
@@ -357,6 +357,8 @@ These options are the same as the ones [accepted by `retry` module](https://gith
 
 ### useQuery(query, variables, options)
 
+This hook returns [`QueryResult`](/docs/queries#query-result) object.
+
 #### query
 
 Type: `DocumentNode`
@@ -405,6 +407,8 @@ Default: `10000`
 
 Timeout to use for this query in milliseconds.
 This value overrides the timeout specified in the client itself.
+
+### QueryResult
 
 `useQuery` hook returns an object consisting of the following fields.
 
