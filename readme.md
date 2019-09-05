@@ -57,7 +57,7 @@ const Todos = () => {
 					))}
 				</ul>
 			)}
-		<div/>
+		</div>
 	);
 };
 
