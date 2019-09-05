@@ -19,8 +19,8 @@
 		"node": ">=8"
 	},
 	"scripts": {
-		"build": "rollup -c",
-		"dev": "rollup -cw",
+		"build": "rollup --config",
+		"dev": "rollup --config --watch",
 		"test": "npm run build && xo && ava"
 	},
 	"keywords": [
@@ -109,16 +109,16 @@
 			"docs"
 		],
 		"rules": {
-			"unicorn/filename-case": 0,
-			"generator-star-spacing": 0,
-			"lines-between-class-members": 0,
-			"react/prop-types": 0,
-			"@typescript-eslint/promise-function-async": 0,
-			"@typescript-eslint/member-naming": 0,
-			"@typescript-eslint/no-explicit-any": 1,
-			"@typescript-eslint/member-ordering": 0,
+			"unicorn/filename-case": "off",
+			"generator-star-spacing": "off",
+			"lines-between-class-members": "off",
+			"react/prop-types": "off",
+			"@typescript-eslint/promise-function-async": "off",
+			"@typescript-eslint/member-naming": "off",
+			"@typescript-eslint/no-explicit-any": "warning",
+			"@typescript-eslint/member-ordering": "off",
 			"quotes": [
-				2,
+				"error",
 				"single",
 				{
 					"avoidEscape": true

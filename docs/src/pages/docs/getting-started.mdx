@@ -19,7 +19,7 @@ $ yarn add draqula graphql graphql-tag
 
 ## Configure
 
-First, initialize Draqula with a full URL to your GraphQL endpoint:
+First, initialize Draqula with the full URL to your GraphQL endpoint:
 
 ```js
 import {Draqula} from 'draqula';
@@ -28,7 +28,7 @@ const client = new Draqula('https://my-graphql-server.com/graphql');
 ```
 
 Next, make your client available to all React components in your app by using `DraqulaProvider`.
-Find a place where you call `render()` function provided by `react-dom` and modify it like this:
+Find the place where you call the `render()` function provided by `react-dom` and modify it like this:
 
 ```jsx
 import {Draqula, DraqulaProvider} from 'draqula';
@@ -86,7 +86,7 @@ const Todos = () => {
 export default Todo;
 ```
 
-This is an example query, of course, but at this point you can replace it with your own one.
+This is an example query, of course, but at this point, you can replace it with your own.
 Your React app is ready to use Draqula!
 
 <NextPageLink to="/docs/queries">Queries</NextPageLink>

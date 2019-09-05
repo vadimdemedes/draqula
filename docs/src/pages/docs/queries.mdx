@@ -6,19 +6,19 @@ position: 2
 
 # Queries
 
-Queries in Draqula are executed via `useQuery` React hook, exposed from the `draqula` module:
+Queries in Draqula are executed via the `useQuery` React hook, exposed from the `draqula` module:
 
 ```jsx
 import {useQuery} from 'draqula';
 ```
 
-All queries **must** be using `gql` tag function from the [`graphql-tag`](https://github.com/apollographql/graphql-tag) module and they **must** be defined outside your component.
-If you define a query inside component, it will be reconstructed on every render, which will make Draqula refetch it infinitely.
+All queries **must** be using the `gql` tag function from the [`graphql-tag`](https://github.com/apollographql/graphql-tag) module and they **must** be defined outside your component.
+If you define a query inside your component, it will be reconstructed on every render, which will make Draqula refetch it infinitely.
 
 ```jsx
 import gql from 'graphql-tag';
 
-// Wrong
+// Incorrect
 const Todos = () => {
 	const TODOS_QUERY = gql`
 		{
@@ -33,7 +33,7 @@ const Todos = () => {
 	// ...
 };
 
-// Right
+// Correct
 const TODOS_QUERY = gql`
 	{
 		todos {
@@ -85,10 +85,10 @@ const Todos = () => {
 `useQuery` returns an object with these essential fields:
 
 - **data** - Query response
-- **isLoading** - Boolean that indicates if query is still loading
+- **isLoading** - Boolean that indicates if the query is still loading
 - **error** - Network or GraphQL error
 
-We're not going to take a deep dive into error handling yet, but you can jump into ["Error Handling"](/docs/error-handling) page to learn more about it.
+We're not going to take a deep dive into error handling yet, but you can jump into the ["Error Handling"](/docs/error-handling) page to learn more about it.
 For the sake of simplicity of the following examples, I'm going to skip all JSX code going forward.
 
 ## Variables
@@ -114,7 +114,7 @@ const Todos = () => {
 };
 ```
 
-Whenever query variables are updated, Draqula will fetch the same query with a new variables as well as reset `data` to `null` and mark query as loading (`loading === true`).
+Whenever query variables are updated, Draqula will fetch the same query with new variables as well as reset `data` to `null` and mark the query as loading (`loading === true`).
 
 ```js
 const Todos = () => {
@@ -135,32 +135,32 @@ const Todos = () => {
 };
 ```
 
-If user loaded this page, they would see a loading indicator first and eventually a list of todos.
-After they clicked "Load next page" button, list would be erased and replaced with a loading indicator again.
-At that time, Draqula would start fetching a query with new `page` variable.
+If a user loaded this page, they would see a loading indicator first and eventually a list of todos.
+After they clicked the "Load next page" button, the list would be erased and replaced with a loading indicator again.
+At that time, Draqula would start fetching a query with a new `page` variable.
 
 ## Caching
 
 Draqula caches data based on the query and the variables you pass to it.
 For example, if you loaded `TODOS_QUERY` with `page = 1` before, next time you attempt to request the same query with the same `page = 1` variable, Draqula will immediately return the last data stored for that query.
 However, it will still send a request to refetch that data, but in background.
-So in cases when there's cache for a query, `isLoading` will equal to `false`, even when query is refetching in the background.
+So in cases when there's a cache for a query, `isLoading` will equal to `false`, even when the query is refetching in the background.
 
 It's important to mention, that Draqula implements basic cache mechanism and it invalidates data very aggressively.
-If mutation returns any of the types used in a query, that query's cache will be invalidated and if query is currently rendered on page, it will be refetched.
+If a mutation returns any of the types used in a query, that query's cache will be invalidated and if a query is currently rendered on the page, it will be refetched.
 
 Unlike other GraphQL clients, Draqula also doesn't have normalization of data by `id` or other fields.
 Lack of this functionality eliminates a whole range of issues, like incorrect data merges, failed cache reads/writes or requirement to manually specify queries to refetch after a mutation.
 
-Cache can be turned off either globally or individually for each query:
+Caching can be turned off either globally or individually for each query:
 
 ```js
-// Turn off cache for all queries
+// Turn off caching for all queries
 const client = new Draqula('https://my-graphql-server.com/graphql', {
 	cache: false
 });
 
-// Turn off cache for an individual query
+// Turn off caching for an individual query
 const {data, isLoading, error} = useQuery(
 	TODOS_QUERY,
 	{
@@ -199,11 +199,11 @@ You can learn more about Draqula's caching mechanism in the ["Caching"](#caching
 
 ## Pagination
 
-If all you need is page-based pagination, where previous set of data is replaced with a new one, this section is not applicable to your use case.
-For that, you can simply increment `page` variable and pass it to your query via [variables](/docs/queries#variables).
+If all you need is page-based pagination, where the previous set of data is replaced with a new one, this section is not applicable to your use-case.
+For that, you can simply increment the `page` variable and pass it to your query via [variables](/docs/queries#variables).
 
-However, if your app needs to add more data to the list along with existing one (for example, infinite loading), meet `fetchMore` function.
-As the name implies, `fetchMore` fetches more data without deleting current data.
+However, if your app needs to add more data to the list along with existing one (for example, infinite loading), meet the `fetchMore` function.
+As the name implies, `fetchMore` fetches more data without deleting the current data.
 Let's use page-based pagination for simplicity, but assume that we want to append new todo items at the end of the list.
 
 ```jsx
@@ -248,7 +248,7 @@ const Todos = () => {
 
 			{data.todos.pagination.hasMore && (
 				<button disabled={isFetchingMore} onClick={onFetchMore}>
-					{isFetchingMore ? 'Loading more todos...' : 'Load more todos'}
+					{isFetchingMore ? 'Loading more todos…' : 'Load more todos'}
 				</button>
 			)}
 		</>
@@ -256,14 +256,14 @@ const Todos = () => {
 };
 ```
 
-To prevent you from managing the loading state of `fetchMore` manually (since `isLoading` will remain `false` when `fetchMore` is called), Draqula exposes `isFetchingMore` variable.
-It's the same as `isLoading`, but only reflects the state of `fetchMore` operation.
+To prevent you from managing the loading state of `fetchMore` manually (since `isLoading` will remain `false` when `fetchMore` is called), Draqula exposes a `isFetchingMore` variable.
+It's the same as `isLoading`, but only reflects the state of the `fetchMore` operation.
 
 ### Merging data
 
-Draqula uses [`_.merge`](https://lodash.com/docs/4.17.15#merge) function from Lodash to merge new data into an existing one with a custom behavior for arrays.
-When Draqula encounters array in new response, it will append all the items of that array to the same array in the existing data.
-If array is `null` in a new response, Draqula will ignore it.
+Draqula uses the [`_.merge`](https://lodash.com/docs/4.17.15#merge) function from Lodash to merge new data into an existing one with custom behavior for arrays.
+When Draqula encounters an array in a new response, it will append all the items of that array to the same array in the existing data.
+If the array in a new response is `null`, Draqula will ignore it.
 
 This is how merging is implemented in Draqula by default:
 
@@ -285,7 +285,7 @@ export default (prevData, nextData) => {
 };
 ```
 
-If you want to use a custom merge strategy (to insert items into the start of an array, for example), you can pass custom `merge` function to `fetchMore`:
+If you want to use a custom merge strategy, for example, to insert items into the start of an array, you can pass a custom `merge` function to `fetchMore`:
 
 ```js
 const customMerge = (oldData, newData) => {
@@ -319,7 +319,7 @@ const Todos = () => {
 Draqula automatically retries all queries by default, if these conditions are true:
 
 1. There were less than 2 retries (this is configurable)
-2. Request didn't respond with 4xx HTTP status code
+2. The request didn't respond with 4xx HTTP status code
 
 Retries can be turned off globally or for each query individually:
 
@@ -344,18 +344,18 @@ const {data, isLoading, error} = useQuery(
 It's also possible to configure how many times Draqula should retry the query:
 
 ```js
-// Retry 5 times (there will be 6 requests, since initial request doesn't count)
+// Retry 5 times (there will be 6 requests since the initial request doesn't count)
 const client = new Draqula('https://graph.ql', {
 	retry: 5
 });
 ```
 
-If you want a more granular control over retries, you can pass an object of options.
+If you want more granular control over retries, you can pass an object of options.
 These options are the same as the ones [accepted by `retry` module](https://github.com/tim-kos/node-retry#retryoperationoptions).
 
 ## API
 
-### useQuery(query, variables, options)
+### useQuery(query, variables?, options?)
 
 This hook returns [`QueryResult`](/docs/queries#query-result) object.
 
@@ -385,13 +385,15 @@ Variables to pass along with query.
 
 #### options
 
+Type: `object`
+
 ##### options.cache
 
 Type: `boolean`<br/>
 Default: `true`
 
-Determines whether to use cache for this query or not.
-This option overrides global `cache` option in the client itself.
+Determines whether to use caching for this query or not.
+This option overrides the global `cache` option in the client itself.
 
 ##### options.retry
 
@@ -416,20 +418,20 @@ This value overrides the timeout specified in the client itself.
 
 Type: `object | null`
 
-Data from query response.
+Data from the query response.
 
 #### isLoading
 
 Type: `boolean`
 
-Indicates whether query is currently loading or not.
+Indicates whether the query is currently loading or not.
 `isLoading` is still `false` if query is being refetched via `refetch()` or `fetchMore()`.
 
 #### error
 
 Type: `NetworkError | GraphQLError | null`
 
-Returns an error that occurred during request, if there was one. Otherwise returns `null`.
+Returns an error that occurred during the request, if there was one. Otherwise returns `null`.
 Read more in the ["Error handling"](/docs/error-handling) section.
 
 #### fetchMore(variables, fetchMoreOptions)
@@ -452,7 +454,7 @@ fetchMore({page: 2}, {merge: customMergeFn});
 Type: `boolean`<br/>
 Default: `false`
 
-Indicates whether `fetchMore` operation is currently in-flight.
+Indicates whether the `fetchMore` operation is currently in-flight.
 
 #### refetch()
 
