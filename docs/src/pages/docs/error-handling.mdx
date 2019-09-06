@@ -9,20 +9,20 @@ position: 4
 You probably noticed that both `useQuery` and `useMutation` return an `error` field.
 This page is about how to handle it and different types of errors it represents.
 
-Draqula exposes 2 kinds of errors:
+Draqula exposes two kinds of errors:
 
-- `NetworkError` - network or timeout errors
-- `GraphQLError` - errors originating from resolvers on the GraphQL server
+- `NetworkError` - Network or timeout errors
+- `GraphQLError` - Errors originating from resolvers on the GraphQL server
 
-Most of the time you won't need such granular error handling and checking for `error` existence should be enough for most use cases, but this functionality is still important to document, so here we go.
+Most of the time you won't need such granular error handling and checking for `error` existence should be enough for most use-cases, but this functionality is still important to document, so here we go.
 
 ## Network errors
 
-Network error can occur in many cases, like when request has timed out or server responded with 4xx/5xx HTTP status codes.
+A network error can occur in many cases, like when a request has timed out or the server responded with 4xx/5xx HTTP status codes.
 Draqula wraps network and timeout errors into `NetworkError` for your convenience.
-However, the original error from [`ky-universal`](https://github.com/sindresorhus/ky-universal) (HTTP client that Draqula uses) can still be retrieved via `originalError` property.
+However, the original error from [`ky-universal`](https://github.com/sindresorhus/ky-universal) (The HTTP client that Draqula uses) can still be retrieved via the `originalError` property.
 
-To detect network error, check if it's an instance of `NetworkError`:
+To detect a network error, check if it's an instance of `NetworkError`:
 
 ```js
 import {NetworkError} from 'draqula';
@@ -68,10 +68,10 @@ The reason for this custom functionality is that a single GraphQL request can re
 If Draqula didn't care about you as much, it would probably just expose this:
 
 ```js
-const {data, isLoading, errors} = useQuery(...)
+const {data, isLoading, errors} = useQuery(…)
 ```
 
-Then you'd have to check if `errors` array's `length` is more than zero and handle network and GraphQL errors manually.
+Then you'd have to check if the `errors` array's `length` is more than zero and handle network and GraphQL errors manually.
 Thankfully, that's not the case.
 
 ```js

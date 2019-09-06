@@ -1,4 +1,4 @@
-import {DepGraph} from 'dependency-graph';
+import {DepGraph as DependencyGraph} from 'dependency-graph';
 import Emittery from 'emittery';
 import {DocumentNode, print} from 'graphql';
 import ky, {Hooks, HTTPError, TimeoutError} from 'ky-universal';
@@ -45,8 +45,8 @@ export default class Draqula {
 	// A graph of two types of nodes:
 	// - Query
 	// - Type (__typename values)
-	// Used to find all queries that have a certain __typename for refetching
-	private readonly graph: DepGraph<string>;
+	// Used to find all queries that have a certain `__typename` for refetching
+	private readonly graph: DependencyGraph<string>;
 
 	// Map of queries with added __typename by original query
 	private queryCache: WeakMap<any, string>;
@@ -54,20 +54,20 @@ export default class Draqula {
 	// Map of query IDs by original query
 	private queryIds: WeakMap<any, string>;
 
-	// Map of data caches for each query by query id
+	// Map of data caches for each query by query ID
 	private readonly dataCache: Map<string, Map<string, any>>;
 
 	constructor(url: string, options: DraqulaOptions = {}) {
 		this.url = url;
 		this.options = options;
 		this.events = new Emittery();
-		this.graph = new DepGraph();
+		this.graph = new DependencyGraph();
 		this.queryCache = new WeakMap();
 		this.queryIds = new WeakMap();
 		this.dataCache = new Map();
 	}
 
-	// For all new queries (that haven't been processed before) add __typename
+	// For all new queries (that haven't been processed before) add `__typename`
 	// to each selection set in the query, generate a query ID by hashing the query itself
 	// and initialize an empty map for caching responses
 	private createQuery(query: DocumentNode): string {

@@ -7,12 +7,12 @@ position: 3
 # Mutations
 
 Unlike queries, mutations in GraphQL are used to create, update or delete data.
-For this purpose, Draqula offers `useMutation` hook.
+For this purpose, Draqula offers a `useMutation` hook.
 Just like queries, remember to define your GraphQL queries **outside** your components to prevent infinite unnecessary rerenders.
 
 ## Basic mutations
 
-Assuming server implements a `ping` mutation, that simply returns `"pong"` string, here's an example of the most basic mutation:
+Assuming the server implements a `ping` mutation, that simply returns `"pong"` string, here's an example of the most basic mutation:
 
 ```jsx
 const PING_MUTATION = gql`
@@ -35,7 +35,7 @@ const PingPong = () => {
 };
 ```
 
-Mutations without variables are not that useful, so let's add some variables to closer match the reality.
+Mutations without variables are not that useful, so let's add some variables to closer match reality.
 
 ## Variables
 
@@ -57,7 +57,7 @@ const CreateTodo = () => {
 	const {mutate} = useMutation(CREATE_TODO_MUTATION);
 
 	const onCreateTodo = async event => {
-		// Prevent form from refreshing the page
+		// Prevent the form from refreshing the page
 		event.preventDefault();
 
 		try {
@@ -81,7 +81,7 @@ const CreateTodo = () => {
 
 ## Caching
 
-When mutation succeeds, Draqula scans GraphQL types returned from that mutation and refetches all queries that use any of these types.
+When a mutation succeeds, Draqula scans the GraphQL types returned from that mutation and refetches all queries that use any of these types.
 For example, let's say we have the following GraphQL schema on our server:
 
 ```gql
@@ -144,18 +144,18 @@ const Blog = () => {
 };
 ```
 
-If user clicks "Create Post" button, `createPost` mutation will be executed, which returns only `Post` type.
-That tells Draqula to find all queries that contain `Post` type and refetch them.
-In that case, `POSTS_QUERY` is the only one that uses this type, so it will be refetched, while `PAGES_QUERY` will remain in the same state.
+If a user clicks the "Create Post" button, the `createPost` mutation will be executed, which returns only the `Post` type.
+That tells Draqula to find all queries that contain the `Post` type and refetches them.
+In this case, `POSTS_QUERY` is the only one that uses this type, so it will be refetched, while `PAGES_QUERY` will remain in the same state.
 
 ## Refetch queries
 
-However, sometimes server uses the same data source, but returns it under various types.
+However, sometimes a server uses the same data source but returns it under various types.
 In that case, Draqula has no way to know that some query uses the same data under the hood and we need to help it find those queries to refetch.
-This is where `refetchQueries` option comes in.
+This is where the `refetchQueries` option comes in.
 It's a list of queries to refetch in addition to the ones Draqula finds by itself.
 
-So if in theory, `PAGES_QUERY` needed to be refetched after `createPost` mutation, this is how it would work:
+So if in theory, `PAGES_QUERY` needed to be refetched after the `createPost` mutation, this is how it would work:
 
 ```js
 const Blog = () => {
@@ -170,7 +170,7 @@ const Blog = () => {
 ```
 
 It's important to mention that by default `createPost` doesn't wait for queries to finish refetching.
-If this behavior is important for you, you can opt in for that via `waitForRefetchQueries` option:
+If this behavior is important for you, you can opt-in for that via the `waitForRefetchQueries` option:
 
 ```js
 const Blog = () => {
@@ -196,15 +196,16 @@ const Blog = () => {
 
 ## API
 
-### useMutation(query, options)
+### useMutation(query, options?)
 
-This hook returns [`MutationResult`](/docs/mutations#mutation-result) object.
+This hook returns a [`MutationResult`](/docs/mutations#mutation-result) object.
 
 #### query
 
 Type: `DocumentNode`
 
-Parsed GraphQL query via `gql` function from [`graphql-tag`](https://github.com/apollographql/graphql-tag) module.
+Parsed GraphQL query via `gql` function from the [`graphql-tag`](https://github.com/apollographql/graphql-tag) module.
+
 For example:
 
 ```js
@@ -217,12 +218,14 @@ const PING_MUTATION = gql`
 
 #### options
 
+Type: `object`
+
 ##### options.refetchQueries
 
 Type: `DocumentNode[]`<br/>
 Default: `[]`
 
-List of queries to refetch after mutation succeeds.
+List of queries to refetch after the mutation succeeds.
 
 ##### options.waitForRefetchQueries
 
@@ -233,15 +236,15 @@ Determines whether to wait for queries to refetch or complete the mutation immed
 
 ### MutationResult
 
-`useMutation` hook returns an object consisting of the following fields.
+The `useMutation` hook returns an object consisting of the following fields.
 
 #### mutate
 
 Type: `Function`
 
-Function that triggers a mutation.
-Accepts an optional object of variables to pass to mutation.
-Returns a promise that resolves when mutation is completed.
+A function that triggers a mutation.
+Accepts an optional object of variables to pass to the mutation.
+Returns a promise that resolves when the mutation is completed.
 
 ```js
 const {mutate} = useMutation(CREATE_POST_MUTATION);
@@ -265,14 +268,14 @@ Data returned from the query.
 Type: `boolean`<br/>
 Default: `false`
 
-Indicates whether mutation is currently in-flight.
+Indicates whether the mutation is currently in-flight.
 
 #### error
 
 Type: `NetworkError | GraphQLError | null`<br/>
 Default: `null`
 
-Error returned from the mutation request.
+The error returned from the mutation request.
 Read more in the ["Error handling"](/docs/error-handling) section.
 
 <NextPageLink to="/docs/error-handling">Error handling</NextPageLink>

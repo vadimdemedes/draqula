@@ -10,11 +10,11 @@ Draqula is a GraphQL client for React apps that don't need everything.
 Instead of offering tons of features like extensive caching mechanism, local state management, subscriptions and so on, Draqula focuses on executing the basics well - queries and mutations.
 
 If you want to take a quick look, keep scrolling this readme.
-Otherwise, check out documentation at https://draqulajs.com.
+Otherwise, check out the documentation at https://draqulajs.com.
 
 ## Install
 
-```bash
+```console
 $ npm install draqula graphql graphql-tag
 ```
 
@@ -48,7 +48,7 @@ const Todos = () => {
 
 	return (
 		<div>
-			{isLoading && <span>Loading...</span>}
+			{isLoading && <span>Loading…</span>}
 			{error && <span>Error: {error.message}</span>}
 			{data && (
 				<ul>
@@ -73,4 +73,4 @@ render(
 
 ## Documentation
 
-Docs are living at https://draqulajs.com
+Docs can be found at https://draqulajs.com
