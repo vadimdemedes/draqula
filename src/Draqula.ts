@@ -141,7 +141,12 @@ export default class Draqula {
 				// GraphQL servers don't fail the request, even if resolvers are failing
 				// They still return 200 status code, but add `errors` field in the response
 				if (Array.isArray(response.errors)) {
-					const errors = response.errors.map((error: any) => new Error(error.message));
+					const errors = response.errors.map((error: any) => {
+						let err = new Error(error.message) as any;
+						for (let key in error) {
+							err[key] = error[key];
+						}
+					});
 					throw new GraphQLError(errors);
 				}
 
