@@ -177,6 +177,7 @@ const Blog = () => {
 	const {data: posts} = useQuery(POSTS_QUERY);
 	const {data: pages} = useQuery(PAGES_QUERY);
 	const {mutate: createPost} = useMutation(CREATE_POST_MUTATION, {
+		waitForRefetchQueries: true,
 		refetchQueries: [PAGES_QUERY]
 	});
 
