@@ -29,45 +29,45 @@ $ npm install draqula graphql graphql-tag
 ## Usage
 
 ```jsx
-import React from 'react';
-import {render} from 'react-dom';
-import {Draqula, DraqulaProvider, useQuery} from 'draqula';
-import gql from 'graphql-tag';
+import React from "react";
+import { render } from "react-dom";
+import { Draqula, DraqulaProvider, useQuery } from "draqula";
+import gql from "graphql-tag";
 
 const TODOS_QUERY = gql`
-	query {
-		todos {
-			id
-			title
-		}
-	}
+  query {
+    todos {
+      id
+      title
+    }
+  }
 `;
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+  const { data, isLoading, error } = useQuery(TODOS_QUERY);
 
-	return (
-		<div>
-			{isLoading && <span>Loading…</span>}
-			{error && <span>Error: {error.message}</span>}
-			{data && (
-				<ul>
-					{data.todos.map(todo => (
-						<li key={todo.id}>{todo.title}</li>
-					))}
-				</ul>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      {isLoading && <span>Loading…</span>}
+      {error && <span>Error: {error.message}</span>}
+      {data && (
+        <ul>
+          {data.todos.map(todo => (
+            <li key={todo.id}>{todo.title}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 };
 
-const client = new Draqula('https://my-graphql-api.com/graphql');
+const client = new Draqula("https://my-graphql-api.com/graphql");
 
 render(
-	<DraqulaProvider client={client}>
-		<Todos />
-	</DraqulaProvider>,
-	document.body
+  <DraqulaProvider client={client}>
+    <Todos />
+  </DraqulaProvider>,
+  document.body
 );
 ```
 
