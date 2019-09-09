@@ -144,8 +144,9 @@ export default class Draqula {
 					const errors = response.errors.map((error: any) => {
 						let error2 = new Error(error.message) as any;
 						for (let key in error) {
-							err[key] = error[key];
+							error2[key] = error[key];
 						}
+						return error2
 					});
 					throw new GraphQLError(errors);
 				}
