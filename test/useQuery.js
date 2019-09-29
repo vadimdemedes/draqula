@@ -942,10 +942,12 @@ test('handle GQL errors', async t => {
 		.reply(200, {
 			errors: [
 				{
-					message: 'Error 1'
+					message: 'Error 1',
+					extensions: {code: 'ERROR_1'}
 				},
 				{
-					message: 'Error 2'
+					message: 'Error 2',
+					extensions: {code: 'ERROR_2'}
 				}
 			]
 		});
@@ -967,7 +969,9 @@ test('handle GQL errors', async t => {
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.toArray().length, 2);
 	t.is(result.current.error.toArray()[0].message, 'Error 1');
+	t.is(result.current.error.toArray()[0].extensions.code, 'ERROR_1');
 	t.is(result.current.error.toArray()[1].message, 'Error 2');
+	t.is(result.current.error.toArray()[1].extensions.code, 'ERROR_2');
 	t.true(nock.isDone());
 });
 
