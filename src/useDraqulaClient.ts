@@ -7,7 +7,7 @@ export default (): Draqula => {
 
 	if (!context || !context.client) {
 		throw new Error(
-			"Draqula client couldn't be found. Did you forget to pass client to your React components via DragulaProvider?"
+			"Draqula client couldn't be found. Did you forget to pass client to your React components via DraqulaProvider?"
 		);
 	}
 
