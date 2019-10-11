@@ -255,12 +255,10 @@ export default class Draqula {
 
 		// Find all queries that have at least one __typename from mutation response
 		for (const typename of typenames) {
-			const nodeName = `type:${typename}`
-			if (this.graph.hasNode(nodeName)) {
-				const dependantQueries = this.graph
-					.dependantsOf(nodeName)
-					.map(queryId => queryId.replace('query:', ''));
+			const nodeName = `type:${typename}`;
 
+			if (this.graph.hasNode(nodeName)) {
+				const dependantQueries = this.graph.dependantsOf(nodeName).map(queryId => queryId.replace('query:', ''));
 				refetchQueries.push(...dependantQueries);
 			}
 		}
