@@ -35,7 +35,7 @@ export default <T>(
 	isLoading: boolean;
 	error: NetworkError | GraphQLError | null;
 	refetch: () => Promise<void>;
-	fetchMore: (variables: object, options: FetchMoreOptions) => Promise<void>;
+	fetchMore: (variables: object, options?: FetchMoreOptions) => Promise<void>;
 	isFetchingMore: boolean;
 } => {
 	const client = useDraqulaClient();
