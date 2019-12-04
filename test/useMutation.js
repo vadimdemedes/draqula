@@ -803,3 +803,146 @@ test('delete cache for refetched queries', async t => {
 		error: null
 	});
 });
+
+test('avoid refetching queries if refetchQueries === false', async t => {
+	const client = new Draqula('http://graph.ql');
+
+	const todos = {
+		todos: [
+			{
+				id: 'a',
+				title: 'A',
+				__typename: 'Todo'
+			}
+		],
+		__typename: 'RootQuery'
+	};
+
+	nock('http://graph.ql')
+		.post('/', /todos/)
+		.reply(200, {
+			data: todos
+		});
+
+	const posts = {
+		posts: [
+			{
+				id: 'x',
+				title: 'X',
+				__typename: 'Post'
+			}
+		],
+		__typename: 'RootQuery'
+	};
+
+	nock('http://graph.ql')
+		.post('/', /posts/)
+		.delay(100)
+		.reply(200, {
+			data: posts
+		});
+
+	nock('http://graph.ql')
+		.post('/', {
+			query: /.+/,
+			variables: {
+				title: 'B'
+			}
+		})
+		.reply(200, {
+			data: {
+				createTodo: {
+					id: 'b',
+					title: 'B',
+					__typename: 'Todo'
+				},
+				__typename: 'RootMutation'
+			}
+		});
+
+	const wrapper = createWrapper(client);
+	const mutation = renderHook(
+		() => {
+			return useMutation(CREATE_TODO_MUTATION, {
+				refetchQueries: false
+			});
+		},
+		{wrapper}
+	);
+	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
+	const postsQuery = renderHook(() => useQuery(POSTS_QUERY), {wrapper});
+
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, todosQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	await todosQuery.waitForNextUpdate();
+	await postsQuery.waitForNextUpdate();
+
+	assertQuery(t, todosQuery.result, {
+		data: todos,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: posts,
+		isLoading: false,
+		error: null
+	});
+
+	act(() => {
+		mutation.result.current.mutate({
+			title: 'B'
+		});
+	});
+
+	assertMutation(t, mutation.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	await mutation.waitForNextUpdate();
+	await t.throwsAsync(todosQuery.waitForNextUpdate({timeout: 1000}));
+	t.true(nock.isDone());
+
+	assertMutation(t, mutation.result, {
+		data: {
+			createTodo: {
+				id: 'b',
+				title: 'B',
+				__typename: 'Todo'
+			},
+			__typename: 'RootMutation'
+		},
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, todosQuery.result, {
+		data: todos,
+		isLoading: false,
+		error: null
+	});
+
+	assertQuery(t, postsQuery.result, {
+		data: posts,
+		isLoading: false,
+		error: null
+	});
+});

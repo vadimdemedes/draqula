@@ -33,7 +33,7 @@ interface QueryOptions {
 }
 
 interface MutateOptions {
-	readonly refetchQueries: DocumentNode[];
+	readonly refetchQueries: boolean | DocumentNode[];
 	readonly waitForRefetchQueries?: boolean;
 }
 
@@ -249,6 +249,11 @@ export default class Draqula {
 		const data = await this.rawQuery<T>(query, variables, {
 			retry: false
 		});
+
+		// If refetching is disabled, we don't need to do any of the following
+		if (options.refetchQueries === false) {
+			return data;
+		}
 
 		const typenames = getTypenames(data);
 		const refetchQueries: string[] = [];

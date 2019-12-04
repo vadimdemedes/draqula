@@ -8,7 +8,7 @@ import NetworkError from './lib/network-error';
 import GraphQLError from './lib/graphql-error';
 
 interface MutationOptions {
-	readonly refetchQueries: DocumentNode[];
+	readonly refetchQueries: boolean | DocumentNode[];
 	readonly waitForRefetchQueries: boolean;
 }
 

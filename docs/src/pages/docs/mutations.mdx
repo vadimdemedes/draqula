@@ -195,6 +195,14 @@ const Blog = () => {
 };
 ```
 
+If you wish to disable refetching of any queries, set `refetchQueries` parameter to `false`:
+
+```js
+useMutation(CREATE_POST_MUTATION, {
+	refetchQueries: false
+});
+```
+
 ## API
 
 ### useMutation(query, options?)
@@ -223,10 +231,11 @@ Type: `object`
 
 ##### options.refetchQueries
 
-Type: `DocumentNode[]`<br/>
+Type: `boolean | DocumentNode[]`<br/>
 Default: `[]`
 
 List of queries to refetch after the mutation succeeds.
+Set to `false` to disable any refetching.
 
 ##### options.waitForRefetchQueries
 
