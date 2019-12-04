@@ -1,4 +1,6 @@
+/* eslint @typescript-eslint/camelcase: ["error", {allow: ["unstable_batchedUpdates"]}] */
 import {useState, useEffect, useRef, useCallback} from 'react';
+import {unstable_batchedUpdates} from 'react-dom';
 import {DocumentNode} from 'graphql';
 import AbortController from 'abort-controller';
 import {merge} from 'lodash';
@@ -47,8 +49,10 @@ export default <T>(
 
 	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
 		if (!refetch && cachedData === null) {
-			setIsLoading(true);
-			setError(null);
+			unstable_batchedUpdates(() => {
+				setIsLoading(true);
+				setError(null);
+			});
 		}
 
 		try {
@@ -57,9 +61,11 @@ export default <T>(
 				signal
 			});
 
-			setData(data);
-			setError(null);
-			setIsLoading(false);
+			unstable_batchedUpdates(() => {
+				setData(data);
+				setError(null);
+				setIsLoading(false);
+			});
 		} catch (error) {
 			// `AbortError` is thrown when request is canceled
 			if (error.name === 'AbortError') {
@@ -70,9 +76,11 @@ export default <T>(
 				throw error;
 			}
 
-			setData(null);
-			setError(error);
-			setIsLoading(false);
+			unstable_batchedUpdates(() => {
+				setData(null);
+				setError(error);
+				setIsLoading(false);
+			});
 		}
 	}, useDeepDependencies([client, query, variables, options, cachedData]));
 
@@ -118,9 +126,11 @@ export default <T>(
 	);
 
 	useEffect(() => {
-		setIsLoading(cachedData === null);
-		setError(null);
-		setData(cachedData);
+		unstable_batchedUpdates(() => {
+			setIsLoading(cachedData === null);
+			setError(null);
+			setData(cachedData);
+		});
 
 		const abortController = new AbortController();
 		fetch({signal: abortController.signal});

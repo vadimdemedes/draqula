@@ -1,4 +1,6 @@
+/* eslint @typescript-eslint/camelcase: ["error", {allow: ["unstable_batchedUpdates"]}] */
 import {useState, useCallback} from 'react';
+import {unstable_batchedUpdates} from 'react-dom';
 import {DocumentNode} from 'graphql';
 import useDraqulaClient from './useDraqulaClient';
 import useDeepDependencies from './useDeepDependencies';
@@ -30,20 +32,27 @@ export default <T>(
 	const [error, setError] = useState(null);
 
 	const mutate = useCallback(async (variables: object = {}): Promise<T | null> => {
-		setData(null);
-		setError(null);
-		setIsLoading(true);
+		unstable_batchedUpdates(() => {
+			setData(null);
+			setError(null);
+			setIsLoading(true);
+		});
 
 		try {
 			const data = await client.mutate<T>(query, variables, options);
-			setData(data);
-			setError(null);
-			setIsLoading(false);
+
+			unstable_batchedUpdates(() => {
+				setData(data);
+				setError(null);
+				setIsLoading(false);
+			});
 
 			return data;
 		} catch (error) {
-			setError(error);
-			setIsLoading(false);
+			unstable_batchedUpdates(() => {
+				setError(error);
+				setIsLoading(false);
+			});
 
 			throw error;
 		}
