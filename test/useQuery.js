@@ -1369,3 +1369,108 @@ test('customize timeout per query', async t => {
 	t.is(result.current.error.message, 'Request timed out');
 	t.true(nock.isDone());
 });
+
+test('clear cache', async t => {
+	const client = new Draqula('http://graph.ql');
+
+	const firstRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {
+				todos: [
+					{
+						id: 'a',
+						title: 'A'
+					},
+					{
+						id: 'b',
+						title: 'B'
+					}
+				]
+			}
+		});
+
+	const secondRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {
+				todos: [
+					{
+						id: 'a',
+						title: 'A'
+					},
+					{
+						id: 'b',
+						title: 'B'
+					},
+					{
+						id: 'c',
+						title: 'C'
+					}
+				]
+			}
+		});
+
+	const firstRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+
+	assertQuery(t, firstRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	await firstRender.waitForNextUpdate();
+
+	assertQuery(t, firstRender.result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	firstRender.unmount();
+	client.clearCache();
+
+	const secondRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+
+	assertQuery(t, secondRender.result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	await secondRender.waitForNextUpdate();
+
+	assertQuery(t, secondRender.result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				},
+				{
+					id: 'c',
+					title: 'C'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	t.true(nock.isDone());
+});

@@ -46,7 +46,7 @@ export default class Draqula {
 	// - Query
 	// - Type (__typename values)
 	// Used to find all queries that have a certain `__typename` for refetching
-	private readonly graph: DependencyGraph<string>;
+	private graph: DependencyGraph<string>;
 
 	// Map of queries with added __typename by original query
 	private queryCache: WeakMap<any, string>;
@@ -283,10 +283,15 @@ export default class Draqula {
 		return data;
 	}
 
-	destroy(): void {
-		this.events.clearListeners();
+	clearCache(): void {
+		this.graph = new DependencyGraph();
 		this.queryCache = new WeakMap();
 		this.queryIds = new WeakMap();
 		this.dataCache.clear();
+	}
+
+	destroy(): void {
+		this.events.clearListeners();
+		this.clearCache();
 	}
 }
