@@ -21,7 +21,8 @@
 	"scripts": {
 		"build": "rollup --config",
 		"dev": "rollup --config --watch",
-		"test": "npm run build && xo && ava"
+		"test": "npm run build && xo && ava",
+		"prepare": "npm run build"
 	},
 	"keywords": [
 		"react",
