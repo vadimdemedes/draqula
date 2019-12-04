@@ -5,6 +5,7 @@ import nock from 'nock';
 import {renderHook, act} from '@testing-library/react-hooks';
 import {Draqula, DraqulaContext, GraphQLError, NetworkError, useQuery, useMutation} from '..';
 import createWrapper from './_create-wrapper';
+import createDocument from './_create-document';
 import assertQuery from './_assert-query';
 
 nock.disableNetConnect();
@@ -502,6 +503,212 @@ test('refetch on demand', async t => {
 	});
 
 	t.true(nock.isDone());
+});
+
+test('refetch when page becomes active', async t => {
+	global.document = createDocument();
+	const client = new Draqula('http://graph.ql');
+
+	const firstRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {
+				todos: [
+					{
+						id: 'a',
+						title: 'A'
+					},
+					{
+						id: 'b',
+						title: 'B'
+					}
+				]
+			}
+		});
+
+	const secondRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {
+				todos: [
+					{
+						id: 'a',
+						title: 'A'
+					}
+				]
+			}
+		});
+
+	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	await waitForNextUpdate();
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	act(() => {
+		document.hidden = false;
+		global.document.emit('visibilitychange');
+	});
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	await waitForNextUpdate();
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	t.true(nock.isDone());
+	global.document = undefined;
+});
+
+test('avoid refetch when page becomes active if this behavior is disabled', async t => {
+	global.document = createDocument();
+	const client = new Draqula('http://graph.ql');
+
+	const firstRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {
+				todos: [
+					{
+						id: 'a',
+						title: 'A'
+					},
+					{
+						id: 'b',
+						title: 'B'
+					}
+				]
+			}
+		});
+
+	const {result, waitForNextUpdate} = renderHook(
+		() => {
+			return useQuery(
+				TODOS_QUERY,
+				{},
+				{
+					refetchOnFocus: false
+				}
+			);
+		},
+		{wrapper: createWrapper(client)}
+	);
+
+	assertQuery(t, result, {
+		data: null,
+		isLoading: true,
+		error: null
+	});
+
+	await waitForNextUpdate();
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	act(() => {
+		document.hidden = false;
+		global.document.emit('visibilitychange');
+	});
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	await t.throwsAsync(waitForNextUpdate({timeout: 1000}));
+
+	assertQuery(t, result, {
+		data: {
+			todos: [
+				{
+					id: 'a',
+					title: 'A'
+				},
+				{
+					id: 'b',
+					title: 'B'
+				}
+			]
+		},
+		isLoading: false,
+		error: null
+	});
+
+	t.true(nock.isDone());
+	global.document = undefined;
 });
 
 test('fetch query with different variables', async t => {

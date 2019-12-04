@@ -7,6 +7,7 @@ import {merge} from 'lodash';
 import useDraqulaClient from './useDraqulaClient';
 import useDataCache from './useDataCache';
 import useDeepDependencies from './useDeepDependencies';
+import usePageFocus from './usePageFocus';
 import NetworkError from './lib/network-error';
 import GraphQLError from './lib/graphql-error';
 import defaultMerge from './lib/merge';
@@ -15,6 +16,7 @@ interface QueryOptions {
 	readonly timeout?: number;
 	readonly retry?: boolean;
 	readonly cache?: boolean;
+	readonly refetchOnFocus?: boolean;
 }
 
 interface FetchOptions {
@@ -99,6 +101,10 @@ export default <T>(
 			signal: refetchAbortControllerRef.current.signal
 		});
 	}, [fetch]);
+
+	usePageFocus(refetch as () => void, {
+		isEnabled: typeof options.refetchOnFocus === 'boolean' ? options.refetchOnFocus : true
+	});
 
 	const fetchMore = useCallback(
 		async (overrideVariables: object, fetchMoreOptions: FetchMoreOptions = defaultFetchMoreOptions): Promise<void> => {

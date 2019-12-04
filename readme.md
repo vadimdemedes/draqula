@@ -23,8 +23,8 @@ $ npm install draqula graphql graphql-tag
 - Simple API and codebase
 - Basic cache implementation with aggressive invalidation and refetching
 - Automatic retries of network/timeout errors and GraphQL queries
-- Keeps data in multiple tabs in sync
 - Straightforward way to hook into requests without a need for middleware
+- Refetches queries when window gets focused
 
 ## Usage
 
