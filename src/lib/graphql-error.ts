@@ -2,7 +2,7 @@ export default class GraphQLError extends Error {
 	private readonly _errors: Error[];
 
 	constructor(errors: Error[]) {
-		super('Request failed');
+		super(errors[0].message || 'Request failed');
 
 		this.name = 'GraphQLError';
 		this._errors = errors;

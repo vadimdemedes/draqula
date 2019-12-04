@@ -72,7 +72,7 @@ const {data, isLoading, errors} = useQuery(…)
 ```
 
 Then you'd have to check if the `errors` array's `length` is more than zero and handle network and GraphQL errors manually.
-Thankfully, that's not the case.
+Thankfully, that's not the case. Draqula combines all errors into one object and sets error's `message` property to equal the message of the first error returned from server.
 
 ```js
 import {GraphQLError} from 'draqula';
@@ -82,15 +82,15 @@ const Todos = () => {
 
 	if (error instanceof GraphQLError) {
 		// GraphQL error, resolvers failed!
+		alert(error.message);
 	}
 
 	// ...
 };
 ```
 
-Remember, `GraphQLError` is a generic "bundle" error that contains multiple errors inside.
-These are the errors that were thrown from your resolvers.
-So to display all of them, we need to convert it into an array and iterate it.
+Keep in mind though, that `GraphQLError` is a "bundle" error that contains multiple errors inside.
+So if you expect multiple errors per query, you need to convert `error` returned from `useQuery` into an array and iterate it to display all of them.
 
 ```jsx
 import {GraphQLError} from 'draqula';

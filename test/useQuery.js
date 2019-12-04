@@ -1174,6 +1174,7 @@ test('handle GQL errors', async t => {
 	t.is(result.current.data, null);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
+	t.is(result.current.error.message, 'Error 1');
 	t.is(result.current.error.toArray().length, 2);
 	t.is(result.current.error.toArray()[0].message, 'Error 1');
 	t.is(result.current.error.toArray()[0].extensions.code, 'ERROR_1');
