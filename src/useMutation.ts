@@ -12,20 +12,19 @@ interface MutationOptions {
 	readonly waitForRefetchQueries: boolean;
 }
 
+interface Result<T> {
+	mutate: (variables?: object) => Promise<T | undefined>;
+	data: T | undefined;
+	isLoading: boolean;
+	error: NetworkError | GraphQLError | undefined;
+}
+
 const defaultMutationOptions = {
 	refetchQueries: [],
 	waitForRefetchQueries: false
 };
 
-export default <T>(
-	query: DocumentNode,
-	options: MutationOptions = defaultMutationOptions
-): {
-	mutate: (variables?: object) => Promise<T | undefined>;
-	data: T | undefined;
-	isLoading: boolean;
-	error: NetworkError | GraphQLError | undefined;
-} => {
+export default <T>(query: DocumentNode, options: MutationOptions = defaultMutationOptions): Result<T> => {
 	const client = useDraqulaClient();
 	const [data, setData] = useState<T | undefined>();
 	const [isLoading, setIsLoading] = useState<boolean>(false);

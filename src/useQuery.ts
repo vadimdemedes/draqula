@@ -28,20 +28,18 @@ interface FetchMoreOptions {
 	merge: <T>(prevData: T, nextData: T) => T;
 }
 
-const defaultFetchMoreOptions = {merge: defaultMerge};
-
-export default <T>(
-	query: DocumentNode,
-	variables: object = {},
-	options: QueryOptions = {}
-): {
+interface Result<T> {
 	data: T | undefined;
 	isLoading: boolean;
 	error: NetworkError | GraphQLError | undefined;
 	refetch: () => Promise<void>;
 	fetchMore: (variables: object, options?: FetchMoreOptions) => Promise<void>;
 	isFetchingMore: boolean;
-} => {
+}
+
+const defaultFetchMoreOptions = {merge: defaultMerge};
+
+export default <T>(query: DocumentNode, variables: object = {}, options: QueryOptions = {}): Result<T> => {
 	const client = useDraqulaClient();
 	const cachedData = useDataCache<T>(query, variables);
 	const [data, setData] = useState<T | undefined>(cachedData);
