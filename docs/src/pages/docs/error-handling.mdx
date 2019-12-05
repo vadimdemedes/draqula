@@ -28,7 +28,7 @@ To detect a network error, check if it's an instance of `NetworkError`:
 import {NetworkError} from 'draqula';
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+	const {data, error} = useQuery(TODOS_QUERY);
 
 	if (error instanceof NetworkError) {
 		// Network error!
@@ -45,7 +45,7 @@ import {NetworkError} from 'draqula';
 import {HTTPError, TimeoutError} from 'ky-universal';
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+	const {data, error} = useQuery(TODOS_QUERY);
 
 	if (error instanceof NetworkError) {
 		if (error.originalError instanceof HTTPError) {
@@ -68,7 +68,7 @@ The reason for this custom functionality is that a single GraphQL request can re
 If Draqula didn't care about you as much, it would probably just expose this:
 
 ```js
-const {data, isLoading, errors} = useQuery(…)
+const {data, errors} = useQuery(…)
 ```
 
 Then you'd have to check if the `errors` array's `length` is more than zero and handle network and GraphQL errors manually.
@@ -78,7 +78,7 @@ Thankfully, that's not the case. Draqula combines all errors into one object and
 import {GraphQLError} from 'draqula';
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+	const {data, error} = useQuery(TODOS_QUERY);
 
 	if (error instanceof GraphQLError) {
 		// GraphQL error, resolvers failed!
@@ -96,7 +96,7 @@ So if you expect multiple errors per query, you need to convert `error` returned
 import {GraphQLError} from 'draqula';
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+	const {data, error} = useQuery(TODOS_QUERY);
 
 	return (
 		<>
@@ -117,7 +117,7 @@ Alternatively, it's possible to iterate `error` itself with `for..of`.
 import {GraphQLError} from 'draqula';
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+	const {data, error} = useQuery(TODOS_QUERY);
 
 	if (error instanceof GraphQLError) {
 		for (const graphqlError of error) {

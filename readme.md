@@ -44,11 +44,11 @@ const TODOS_QUERY = gql`
 `;
 
 const Todos = () => {
-	const {data, isLoading, error} = useQuery(TODOS_QUERY);
+	const {data, error} = useQuery(TODOS_QUERY);
 
 	return (
 		<div>
-			{isLoading && <span>Loading…</span>}
+			{!data && <span>Loading…</span>}
 			{error && <span>Error: {error.message}</span>}
 			{data && (
 				<ul>

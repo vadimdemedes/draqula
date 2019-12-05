@@ -36,7 +36,6 @@ export default <T>(
 	options: QueryOptions = {}
 ): {
 	data: T | undefined;
-	isLoading: boolean;
 	error: NetworkError | GraphQLError | undefined;
 	refetch: () => Promise<void>;
 	fetchMore: (variables: object, options?: FetchMoreOptions) => Promise<void>;
@@ -45,16 +44,12 @@ export default <T>(
 	const client = useDraqulaClient();
 	const cachedData = useDataCache<T>(query, variables);
 	const [data, setData] = useState<T | undefined>(cachedData);
-	const [isLoading, setIsLoading] = useState<boolean>(cachedData === undefined);
 	const [error, setError] = useState<NetworkError | GraphQLError | undefined>();
 	const [isFetchingMore, setFetchingMore] = useState<boolean>(false);
 
 	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
 		if (!refetch && cachedData === undefined) {
-			unstable_batchedUpdates(() => {
-				setIsLoading(true);
-				setError(undefined);
-			});
+			setError(undefined);
 		}
 
 		try {
@@ -66,7 +61,6 @@ export default <T>(
 			unstable_batchedUpdates(() => {
 				setData(data);
 				setError(undefined);
-				setIsLoading(false);
 			});
 		} catch (error) {
 			// `AbortError` is thrown when request is canceled
@@ -81,7 +75,6 @@ export default <T>(
 			unstable_batchedUpdates(() => {
 				setData(undefined);
 				setError(error);
-				setIsLoading(false);
 			});
 		}
 	}, useDeepDependencies([client, query, variables, options, cachedData]));
@@ -133,7 +126,6 @@ export default <T>(
 
 	useEffect(() => {
 		unstable_batchedUpdates(() => {
-			setIsLoading(cachedData === undefined);
 			setError(undefined);
 			setData(cachedData);
 		});
@@ -146,5 +138,5 @@ export default <T>(
 
 	useEffect(() => client.watchQuery(query, refetch), [client, query, refetch]);
 
-	return {data, isLoading, error, fetchMore, isFetchingMore, refetch};
+	return {data, error, fetchMore, isFetchingMore, refetch};
 };

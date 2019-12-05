@@ -53,7 +53,6 @@ test('query data', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -72,7 +71,6 @@ test('query data', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -124,7 +122,6 @@ test('render cached data if possible and refetch', async t => {
 
 	assertQuery(t, firstRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -143,7 +140,6 @@ test('render cached data if possible and refetch', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -164,7 +160,6 @@ test('render cached data if possible and refetch', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -187,7 +182,6 @@ test('render cached data if possible and refetch', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -241,7 +235,6 @@ test('disable cache for all queries', async t => {
 
 	assertQuery(t, firstRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -260,7 +253,6 @@ test('disable cache for all queries', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -270,7 +262,6 @@ test('disable cache for all queries', async t => {
 
 	assertQuery(t, secondRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -293,7 +284,6 @@ test('disable cache for all queries', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -345,7 +335,6 @@ test('disable cache per query', async t => {
 
 	assertQuery(t, firstRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -364,7 +353,6 @@ test('disable cache per query', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -376,7 +364,6 @@ test('disable cache per query', async t => {
 
 	assertQuery(t, secondRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -399,7 +386,6 @@ test('disable cache per query', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -443,7 +429,6 @@ test('refetch on demand', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -462,7 +447,6 @@ test('refetch on demand', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -483,7 +467,6 @@ test('refetch on demand', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -498,7 +481,6 @@ test('refetch on demand', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -543,7 +525,6 @@ test('refetch when page becomes active', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -562,7 +543,6 @@ test('refetch when page becomes active', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -584,7 +564,6 @@ test('refetch when page becomes active', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -599,7 +578,6 @@ test('refetch when page becomes active', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -643,7 +621,6 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -662,7 +639,6 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -684,7 +660,6 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -703,7 +678,6 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -769,7 +743,6 @@ test('fetch query with different variables', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -777,7 +750,6 @@ test('fetch query with different variables', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -786,7 +758,6 @@ test('fetch query with different variables', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -794,7 +765,6 @@ test('fetch query with different variables', async t => {
 
 	assertQuery(t, result, {
 		data: secondPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -881,7 +851,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -889,7 +858,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -898,7 +866,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -906,7 +873,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: secondPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -915,7 +881,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -923,7 +888,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -932,7 +896,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: secondPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -940,7 +903,6 @@ test('cache data for different variables', async t => {
 
 	assertQuery(t, result, {
 		data: secondPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -1004,7 +966,6 @@ test('fetch more', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1012,7 +973,6 @@ test('fetch more', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -1024,7 +984,6 @@ test('fetch more', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined,
 		isFetchingMore: true
 	});
@@ -1035,7 +994,6 @@ test('fetch more', async t => {
 		data: {
 			todos: [...firstPage.todos, ...secondPage.todos]
 		},
-		isLoading: false,
 		error: undefined,
 		isFetchingMore: false
 	});
@@ -1100,7 +1058,6 @@ test('fetch more with custom merge function', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1108,7 +1065,6 @@ test('fetch more with custom merge function', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -1125,7 +1081,6 @@ test('fetch more with custom merge function', async t => {
 
 	assertQuery(t, result, {
 		data: firstPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -1133,7 +1088,6 @@ test('fetch more with custom merge function', async t => {
 
 	assertQuery(t, result, {
 		data: secondPage,
-		isLoading: false,
 		error: undefined
 	});
 
@@ -1163,7 +1117,6 @@ test('handle GQL errors', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1172,7 +1125,6 @@ test('handle GQL errors', async t => {
 	await waitForNextUpdate();
 
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.message, 'Error 1');
 	t.is(result.current.error.toArray().length, 2);
@@ -1205,7 +1157,6 @@ test('do not retry failed requests', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1213,7 +1164,6 @@ test('do not retry failed requests', async t => {
 
 	await waitForNextUpdate();
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.toArray().length, 2);
 	t.is(result.current.error.toArray()[0].message, 'Error 1');
@@ -1244,7 +1194,6 @@ test('retry failed requests N times', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1252,7 +1201,6 @@ test('retry failed requests N times', async t => {
 
 	await waitForNextUpdate();
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.toArray().length, 2);
 	t.is(result.current.error.toArray()[0].message, 'Error 1');
@@ -1272,7 +1220,6 @@ test('handle network errors', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1281,7 +1228,6 @@ test('handle network errors', async t => {
 	await waitForNextUpdate();
 
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Internal Server Error');
 	t.true(nock.isDone());
@@ -1298,7 +1244,6 @@ test('do not retry 4xx responses', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1306,7 +1251,6 @@ test('do not retry 4xx responses', async t => {
 
 	await waitForNextUpdate();
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Bad Request');
 	t.true(nock.isDone());
@@ -1327,7 +1271,6 @@ test('customize timeout for all queries', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1335,7 +1278,6 @@ test('customize timeout for all queries', async t => {
 
 	await waitForNextUpdate();
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Request timed out');
 	t.true(nock.isDone());
@@ -1356,7 +1298,6 @@ test('customize timeout per query', async t => {
 
 	assertQuery(t, result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1364,7 +1305,6 @@ test('customize timeout per query', async t => {
 
 	await waitForNextUpdate();
 	t.is(result.current.data, undefined);
-	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Request timed out');
 	t.true(nock.isDone());
@@ -1415,7 +1355,6 @@ test('clear cache', async t => {
 
 	assertQuery(t, firstRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1434,7 +1373,6 @@ test('clear cache', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
@@ -1445,7 +1383,6 @@ test('clear cache', async t => {
 
 	assertQuery(t, secondRender.result, {
 		data: undefined,
-		isLoading: true,
 		error: undefined
 	});
 
@@ -1468,7 +1405,6 @@ test('clear cache', async t => {
 				}
 			]
 		},
-		isLoading: false,
 		error: undefined
 	});
 
