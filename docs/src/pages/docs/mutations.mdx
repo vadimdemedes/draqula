@@ -269,7 +269,6 @@ const onCreatePost = async () => {
 #### data
 
 Type: `object`<br/>
-Default: `null`
 
 Data returned from the query.
 
@@ -282,8 +281,7 @@ Indicates whether the mutation is currently in-flight.
 
 #### error
 
-Type: `NetworkError | GraphQLError | null`<br/>
-Default: `null`
+Type: `NetworkError | GraphQLError | undefined`<br/>
 
 The error returned from the mutation request.
 Read more in the ["Error handling"](/docs/error-handling) section.

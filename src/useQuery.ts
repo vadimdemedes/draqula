@@ -35,25 +35,25 @@ export default <T>(
 	variables: object = {},
 	options: QueryOptions = {}
 ): {
-	data: T | null;
+	data: T | undefined;
 	isLoading: boolean;
-	error: NetworkError | GraphQLError | null;
+	error: NetworkError | GraphQLError | undefined;
 	refetch: () => Promise<void>;
 	fetchMore: (variables: object, options?: FetchMoreOptions) => Promise<void>;
 	isFetchingMore: boolean;
 } => {
 	const client = useDraqulaClient();
 	const cachedData = useDataCache<T>(query, variables);
-	const [data, setData] = useState<T | null>(cachedData);
-	const [isLoading, setIsLoading] = useState(cachedData === null);
-	const [error, setError] = useState(null);
-	const [isFetchingMore, setFetchingMore] = useState(false);
+	const [data, setData] = useState<T | undefined>(cachedData);
+	const [isLoading, setIsLoading] = useState<boolean>(cachedData === undefined);
+	const [error, setError] = useState<NetworkError | GraphQLError | undefined>();
+	const [isFetchingMore, setFetchingMore] = useState<boolean>(false);
 
 	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
-		if (!refetch && cachedData === null) {
+		if (!refetch && cachedData === undefined) {
 			unstable_batchedUpdates(() => {
 				setIsLoading(true);
-				setError(null);
+				setError(undefined);
 			});
 		}
 
@@ -65,7 +65,7 @@ export default <T>(
 
 			unstable_batchedUpdates(() => {
 				setData(data);
-				setError(null);
+				setError(undefined);
 				setIsLoading(false);
 			});
 		} catch (error) {
@@ -79,7 +79,7 @@ export default <T>(
 			}
 
 			unstable_batchedUpdates(() => {
-				setData(null);
+				setData(undefined);
 				setError(error);
 				setIsLoading(false);
 			});
@@ -88,7 +88,7 @@ export default <T>(
 
 	// `refetch` can be executed manually any number of times, so we have to manually
 	// take care of canceling the last refetch request by maintaing reference to the last abort controller
-	const refetchAbortControllerRef = useRef<AbortController | null>(null);
+	const refetchAbortControllerRef = useRef<AbortController>();
 	const refetch = useCallback(() => {
 		if (refetchAbortControllerRef.current) {
 			refetchAbortControllerRef.current.abort();
@@ -114,11 +114,11 @@ export default <T>(
 				const nextData = await client.query<T>(query, merge({}, variables, overrideVariables), options);
 
 				setData(data => {
-					if (data === null) {
+					if (data === undefined) {
 						return nextData;
 					}
 
-					if (nextData === null) {
+					if (nextData === undefined) {
 						return data;
 					}
 
@@ -133,8 +133,8 @@ export default <T>(
 
 	useEffect(() => {
 		unstable_batchedUpdates(() => {
-			setIsLoading(cachedData === null);
-			setError(null);
+			setIsLoading(cachedData === undefined);
+			setError(undefined);
 			setData(cachedData);
 		});
 

@@ -21,20 +21,20 @@ export default <T>(
 	query: DocumentNode,
 	options: MutationOptions = defaultMutationOptions
 ): {
-	mutate: (variables?: object) => Promise<T | null>;
-	data: T | null;
+	mutate: (variables?: object) => Promise<T | undefined>;
+	data: T | undefined;
 	isLoading: boolean;
-	error: NetworkError | GraphQLError | null;
+	error: NetworkError | GraphQLError | undefined;
 } => {
 	const client = useDraqulaClient();
-	const [data, setData] = useState<T | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState(null);
+	const [data, setData] = useState<T | undefined>();
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [error, setError] = useState<NetworkError | GraphQLError | undefined>();
 
-	const mutate = useCallback(async (variables: object = {}): Promise<T | null> => {
+	const mutate = useCallback(async (variables: object = {}): Promise<T | undefined> => {
 		unstable_batchedUpdates(() => {
-			setData(null);
-			setError(null);
+			setData(undefined);
+			setError(undefined);
 			setIsLoading(true);
 		});
 
@@ -43,7 +43,7 @@ export default <T>(
 
 			unstable_batchedUpdates(() => {
 				setData(data);
-				setError(null);
+				setError(undefined);
 				setIsLoading(false);
 			});
 

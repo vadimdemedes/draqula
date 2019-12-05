@@ -114,7 +114,7 @@ const Todos = () => {
 };
 ```
 
-Whenever query variables are updated, Draqula will fetch the same query with new variables as well as reset `data` to `null` and mark the query as loading (`loading === true`).
+Whenever query variables are updated, Draqula will fetch the same query with new variables as well as reset `data` to `undefined` and mark the query as loading (`loading === true`).
 
 ```js
 const Todos = () => {
@@ -424,7 +424,7 @@ Useful for keeping data on your page up-to-date when user comes back.
 
 #### data
 
-Type: `object | null`
+Type: `object | undefined`
 
 Data from the query response.
 
@@ -437,9 +437,9 @@ Indicates whether the query is currently loading or not.
 
 #### error
 
-Type: `NetworkError | GraphQLError | null`
+Type: `NetworkError | GraphQLError | undefined`
 
-Returns an error that occurred during the request, if there was one. Otherwise returns `null`.
+Returns an error that occurred during the request, if there was one. Otherwise returns `undefined`.
 Read more in the ["Error handling"](/docs/error-handling) section.
 
 #### fetchMore(variables, fetchMoreOptions)

@@ -52,9 +52,9 @@ test('query data', async t => {
 
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -73,7 +73,7 @@ test('query data', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -123,9 +123,9 @@ test('render cached data if possible and refetch', async t => {
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, firstRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await firstRender.waitForNextUpdate();
@@ -144,7 +144,7 @@ test('render cached data if possible and refetch', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	firstRender.unmount();
@@ -165,7 +165,7 @@ test('render cached data if possible and refetch', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await secondRender.waitForNextUpdate();
@@ -188,7 +188,7 @@ test('render cached data if possible and refetch', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -240,9 +240,9 @@ test('disable cache for all queries', async t => {
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, firstRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await firstRender.waitForNextUpdate();
@@ -261,7 +261,7 @@ test('disable cache for all queries', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	firstRender.unmount();
@@ -269,9 +269,9 @@ test('disable cache for all queries', async t => {
 	const secondRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, secondRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await secondRender.waitForNextUpdate();
@@ -294,7 +294,7 @@ test('disable cache for all queries', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -344,9 +344,9 @@ test('disable cache per query', async t => {
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY, {}, {cache: false}), {wrapper: createWrapper(client)});
 
 	assertQuery(t, firstRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await firstRender.waitForNextUpdate();
@@ -365,7 +365,7 @@ test('disable cache per query', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	firstRender.unmount();
@@ -375,9 +375,9 @@ test('disable cache per query', async t => {
 	});
 
 	assertQuery(t, secondRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await secondRender.waitForNextUpdate();
@@ -400,7 +400,7 @@ test('disable cache per query', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -442,9 +442,9 @@ test('refetch on demand', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -463,7 +463,7 @@ test('refetch on demand', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -484,7 +484,7 @@ test('refetch on demand', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -499,7 +499,7 @@ test('refetch on demand', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -542,9 +542,9 @@ test('refetch when page becomes active', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -563,7 +563,7 @@ test('refetch when page becomes active', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -585,7 +585,7 @@ test('refetch when page becomes active', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -600,7 +600,7 @@ test('refetch when page becomes active', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -642,9 +642,9 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 	);
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -663,7 +663,7 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -685,7 +685,7 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await t.throwsAsync(waitForNextUpdate({timeout: 1000}));
@@ -704,7 +704,7 @@ test('avoid refetch when page becomes active if this behavior is disabled', asyn
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -768,9 +768,9 @@ test('fetch query with different variables', async t => {
 	});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -778,16 +778,16 @@ test('fetch query with different variables', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	page = 2;
 	rerender();
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -795,7 +795,7 @@ test('fetch query with different variables', async t => {
 	assertQuery(t, result, {
 		data: secondPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -880,9 +880,9 @@ test('cache data for different variables', async t => {
 	});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -890,16 +890,16 @@ test('cache data for different variables', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	page = 2;
 	rerender();
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -907,7 +907,7 @@ test('cache data for different variables', async t => {
 	assertQuery(t, result, {
 		data: secondPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	page = 1;
@@ -916,7 +916,7 @@ test('cache data for different variables', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -924,7 +924,7 @@ test('cache data for different variables', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	page = 2;
@@ -933,7 +933,7 @@ test('cache data for different variables', async t => {
 	assertQuery(t, result, {
 		data: secondPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -941,7 +941,7 @@ test('cache data for different variables', async t => {
 	assertQuery(t, result, {
 		data: secondPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -1003,9 +1003,9 @@ test('fetch more', async t => {
 	});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -1013,7 +1013,7 @@ test('fetch more', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -1025,7 +1025,7 @@ test('fetch more', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null,
+		error: undefined,
 		isFetchingMore: true
 	});
 
@@ -1036,7 +1036,7 @@ test('fetch more', async t => {
 			todos: [...firstPage.todos, ...secondPage.todos]
 		},
 		isLoading: false,
-		error: null,
+		error: undefined,
 		isFetchingMore: false
 	});
 
@@ -1099,9 +1099,9 @@ test('fetch more with custom merge function', async t => {
 	});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -1109,7 +1109,7 @@ test('fetch more with custom merge function', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -1126,7 +1126,7 @@ test('fetch more with custom merge function', async t => {
 	assertQuery(t, result, {
 		data: firstPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -1134,7 +1134,7 @@ test('fetch more with custom merge function', async t => {
 	assertQuery(t, result, {
 		data: secondPage,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -1162,16 +1162,16 @@ test('handle GQL errors', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
 
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.message, 'Error 1');
@@ -1204,15 +1204,15 @@ test('do not retry failed requests', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.toArray().length, 2);
@@ -1243,15 +1243,15 @@ test('retry failed requests N times', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof GraphQLError);
 	t.is(result.current.error.toArray().length, 2);
@@ -1271,16 +1271,16 @@ test('handle network errors', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
 
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Internal Server Error');
@@ -1297,15 +1297,15 @@ test('do not retry 4xx responses', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Bad Request');
@@ -1326,15 +1326,15 @@ test('customize timeout for all queries', async t => {
 	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Request timed out');
@@ -1355,15 +1355,15 @@ test('customize timeout per query', async t => {
 	});
 
 	assertQuery(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	t.is(result.error, undefined);
 
 	await waitForNextUpdate();
-	t.is(result.current.data, null);
+	t.is(result.current.data, undefined);
 	t.false(result.current.isLoading);
 	t.true(result.current.error instanceof NetworkError);
 	t.is(result.current.error.message, 'Request timed out');
@@ -1414,9 +1414,9 @@ test('clear cache', async t => {
 	const firstRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, firstRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await firstRender.waitForNextUpdate();
@@ -1435,7 +1435,7 @@ test('clear cache', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	firstRender.unmount();
@@ -1444,9 +1444,9 @@ test('clear cache', async t => {
 	const secondRender = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
 
 	assertQuery(t, secondRender.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await secondRender.waitForNextUpdate();
@@ -1469,7 +1469,7 @@ test('clear cache', async t => {
 			]
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());

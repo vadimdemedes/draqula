@@ -63,9 +63,9 @@ test('run mutation', async t => {
 	});
 
 	assertMutation(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -75,9 +75,9 @@ test('run mutation', async t => {
 	});
 
 	assertMutation(t, result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await waitForNextUpdate();
@@ -90,7 +90,7 @@ test('run mutation', async t => {
 			}
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -180,21 +180,21 @@ test('refetch queries with the same types', async t => {
 	const postsQuery = renderHook(() => useQuery(POSTS_QUERY), {wrapper});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await todosQuery.waitForNextUpdate();
@@ -203,13 +203,13 @@ test('refetch queries with the same types', async t => {
 	assertQuery(t, todosQuery.result, {
 		data: firstTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
 		data: posts,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -219,9 +219,9 @@ test('refetch queries with the same types', async t => {
 	});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await mutation.waitForNextUpdate();
@@ -238,19 +238,19 @@ test('refetch queries with the same types', async t => {
 			__typename: 'RootMutation'
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
 		data: secondTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
 		data: posts,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 });
 
@@ -368,21 +368,21 @@ test('refetch queries with additional custom queries', async t => {
 	const postsQuery = renderHook(() => useQuery(POSTS_QUERY), {wrapper});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await todosQuery.waitForNextUpdate();
@@ -391,13 +391,13 @@ test('refetch queries with additional custom queries', async t => {
 	assertQuery(t, todosQuery.result, {
 		data: firstTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
 		data: firstPosts,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -407,9 +407,9 @@ test('refetch queries with additional custom queries', async t => {
 	});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await mutation.waitForNextUpdate();
@@ -427,19 +427,19 @@ test('refetch queries with additional custom queries', async t => {
 			__typename: 'RootMutation'
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
 		data: secondTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
 		data: secondPosts,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 });
 
@@ -509,15 +509,15 @@ test('do not wait until queries are refetched before completing mutation', async
 	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await todosQuery.waitForNextUpdate();
@@ -525,7 +525,7 @@ test('do not wait until queries are refetched before completing mutation', async
 	assertQuery(t, todosQuery.result, {
 		data: firstTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await mutation.result.current.mutate({
@@ -537,7 +537,7 @@ test('do not wait until queries are refetched before completing mutation', async
 	assertQuery(t, todosQuery.result, {
 		data: firstTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertMutation(t, mutation.result, {
@@ -550,7 +550,7 @@ test('do not wait until queries are refetched before completing mutation', async
 			__typename: 'RootMutation'
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await todosQuery.waitForNextUpdate();
@@ -558,7 +558,7 @@ test('do not wait until queries are refetched before completing mutation', async
 	assertQuery(t, todosQuery.result, {
 		data: secondTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	t.true(nock.isDone());
@@ -636,15 +636,15 @@ test('wait until queries are refetched before completing mutation', async t => {
 	const todosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await todosQuery.waitForNextUpdate();
@@ -652,7 +652,7 @@ test('wait until queries are refetched before completing mutation', async t => {
 	assertQuery(t, todosQuery.result, {
 		data: firstTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	await mutation.result.current.mutate({
@@ -671,13 +671,13 @@ test('wait until queries are refetched before completing mutation', async t => {
 			__typename: 'RootMutation'
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
 		data: secondTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 });
 
@@ -745,17 +745,17 @@ test('delete cache for refetched queries', async t => {
 	const mutation = renderHook(() => useMutation(CREATE_TODO_MUTATION), {wrapper});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	const firstTodosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 
 	assertQuery(t, firstTodosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await firstTodosQuery.waitForNextUpdate();
@@ -763,7 +763,7 @@ test('delete cache for refetched queries', async t => {
 	assertQuery(t, firstTodosQuery.result, {
 		data: firstTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	firstTodosQuery.unmount();
@@ -784,15 +784,15 @@ test('delete cache for refetched queries', async t => {
 			__typename: 'RootMutation'
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	const secondTodosQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper});
 
 	assertQuery(t, secondTodosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await secondTodosQuery.waitForNextUpdate();
@@ -800,7 +800,7 @@ test('delete cache for refetched queries', async t => {
 	assertQuery(t, secondTodosQuery.result, {
 		data: secondTodos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 });
 
@@ -873,21 +873,21 @@ test('avoid refetching queries if refetchQueries === false', async t => {
 	const postsQuery = renderHook(() => useQuery(POSTS_QUERY), {wrapper});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await todosQuery.waitForNextUpdate();
@@ -896,13 +896,13 @@ test('avoid refetching queries if refetchQueries === false', async t => {
 	assertQuery(t, todosQuery.result, {
 		data: todos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
 		data: posts,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	act(() => {
@@ -912,9 +912,9 @@ test('avoid refetching queries if refetchQueries === false', async t => {
 	});
 
 	assertMutation(t, mutation.result, {
-		data: null,
+		data: undefined,
 		isLoading: true,
-		error: null
+		error: undefined
 	});
 
 	await mutation.waitForNextUpdate();
@@ -931,18 +931,18 @@ test('avoid refetching queries if refetchQueries === false', async t => {
 			__typename: 'RootMutation'
 		},
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, todosQuery.result, {
 		data: todos,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 
 	assertQuery(t, postsQuery.result, {
 		data: posts,
 		isLoading: false,
-		error: null
+		error: undefined
 	});
 });

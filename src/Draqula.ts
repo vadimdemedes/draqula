@@ -107,20 +107,20 @@ export default class Draqula {
 		}
 	}
 
-	getDataCache<T>(query: DocumentNode, variables: object): T | null {
+	getDataCache<T>(query: DocumentNode, variables: object): T | undefined {
 		if (this.options.cache === false) {
-			return null;
+			return;
 		}
 
 		const queryId = this.getQueryId(query);
 		const cache = this.dataCache.get(queryId);
 
 		if (!cache) {
-			return null;
+			return;
 		}
 
 		const cacheKey = this.getCacheKey(variables);
-		return cache.get(cacheKey) || null;
+		return cache.get(cacheKey);
 	}
 
 	private async rawQuery<T>(query: DocumentNode, variables: object, options: QueryOptions): Promise<T> {
