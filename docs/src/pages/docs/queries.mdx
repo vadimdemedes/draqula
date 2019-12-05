@@ -353,6 +353,28 @@ const client = new Draqula('https://graph.ql', {
 If you want more granular control over retries, you can pass an object of options.
 These options are the same as the ones [accepted by `retry` module](https://github.com/tim-kos/node-retry#retryoperationoptions).
 
+## Preloading
+
+Preloading queries is useful for speeding up user experience, when you know which page user is most likely to open next.
+
+To do so, we can use `preload` method exposed by the client:
+
+```js
+import {useEffect} from 'react';
+import {useDraqulaClient} from 'draqula';
+
+const IndexPage = () => {
+	const client = useDraqulaClient();
+
+	// Preload TODOS_QUERY once this component mounts
+	useEffect(() => {
+		client.preload(TODOS_QUERY, {page: 0});
+	}, []);
+};
+```
+
+Next time other component tries to load `TODOS_QUERY`, cached data will be returned immediately.
+
 ## API
 
 ### useQuery(query, variables?, options?)
