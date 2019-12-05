@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "gatsby build",
-    "develop": "gatsby develop",
+    "dev": "gatsby develop",
     "start": "npm run develop",
     "serve": "gatsby serve"
   },
