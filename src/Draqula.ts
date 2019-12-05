@@ -228,6 +228,10 @@ export default class Draqula {
 		return data;
 	}
 
+	async preload<T>(query: DocumentNode, variables: object = {}): Promise<void> {
+		await this.query<T>(query, variables, {});
+	}
+
 	watchQuery(query: DocumentNode, callback: (queryId: string) => any): () => void {
 		const queryId = this.getQueryId(query);
 		this.events.on(`refetch:${queryId}`, callback);

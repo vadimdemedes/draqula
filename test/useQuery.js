@@ -1474,3 +1474,44 @@ test('clear cache', async t => {
 
 	t.true(nock.isDone());
 });
+
+test('preload query and render with warm cache', async t => {
+	const client = new Draqula('http://graph.ql');
+
+	const todos = [
+		{
+			id: 'a',
+			title: 'A'
+		},
+		{
+			id: 'b',
+			title: 'B'
+		}
+	];
+
+	const request = nock('http://graph.ql')
+		.post('/')
+		.twice()
+		.reply(200, {
+			data: {todos}
+		});
+
+	await client.preload(TODOS_QUERY);
+
+	const {result, waitForNextUpdate} = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+	assertQuery(t, result, {
+		data: {todos},
+		isLoading: false,
+		error: undefined
+	});
+
+	await waitForNextUpdate();
+
+	assertQuery(t, result, {
+		data: {todos},
+		isLoading: false,
+		error: undefined
+	});
+
+	t.true(nock.isDone());
+});
