@@ -1,6 +1,6 @@
 {
 	"name": "draqula",
-	"version": "0.2.3",
+	"version": "0.3.0",
 	"description": "GraphQL client for React apps that don't need everything",
 	"license": "MIT",
 	"repository": "vadimdemedes/draqula",
