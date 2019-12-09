@@ -33,7 +33,7 @@ interface QueryOptions {
 }
 
 interface MutateOptions {
-	readonly refetchQueries: boolean | DocumentNode[];
+	readonly refetchQueries?: boolean | DocumentNode[];
 	readonly waitForRefetchQueries?: boolean;
 }
 
