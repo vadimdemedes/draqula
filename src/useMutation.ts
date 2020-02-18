@@ -1,6 +1,4 @@
-/* eslint @typescript-eslint/camelcase: ["error", {allow: ["unstable_batchedUpdates"]}] */
-import {useState, useCallback} from 'react';
-import {unstable_batchedUpdates} from 'react-dom';
+import {useReducer, useCallback, Reducer} from 'react';
 import {DocumentNode} from 'graphql';
 import useDraqulaClient from './useDraqulaClient';
 import useDeepDependencies from './useDeepDependencies';
@@ -24,38 +22,79 @@ const defaultMutationOptions = {
 	waitForRefetchQueries: false
 };
 
+interface State<T> {
+	data: T | undefined;
+	error: NetworkError | GraphQLError | undefined;
+	isLoading: boolean;
+}
+
+interface Action<T> {
+	type: 'mutate' | 'success' | 'error';
+	data?: T;
+	error?: NetworkError | GraphQLError | undefined;
+}
+
+const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
+	if (action.type === 'mutate') {
+		return {
+			data: undefined,
+			error: undefined,
+			isLoading: true
+		};
+	}
+
+	if (action.type === 'success') {
+		return {
+			data: action.data,
+			error: undefined,
+			isLoading: false
+		};
+	}
+
+	if (action.type === 'error') {
+		return {
+			data: undefined,
+			error: action.error,
+			isLoading: false
+		};
+	}
+
+	return state;
+};
+
+const initialState = {
+	data: undefined,
+	error: undefined,
+	isLoading: false
+};
+
 export default <T>(query: DocumentNode, options: MutationOptions = defaultMutationOptions): Result<T> => {
 	const client = useDraqulaClient();
-	const [data, setData] = useState<T | undefined>();
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [error, setError] = useState<NetworkError | GraphQLError | undefined>();
+	const [{data, error, isLoading}, dispatch] = useReducer<Reducer<State<T>, Action<T>>>(reducer, initialState);
 
 	const mutate = useCallback(async (variables: object = {}): Promise<T | undefined> => {
-		unstable_batchedUpdates(() => {
-			setData(undefined);
-			setError(undefined);
-			setIsLoading(true);
+		dispatch({
+			type: 'mutate'
 		});
 
 		try {
 			const data = await client.mutate<T>(query, variables, options);
 
-			unstable_batchedUpdates(() => {
-				setData(data);
-				setError(undefined);
-				setIsLoading(false);
+			dispatch({
+				type: 'success',
+				data
 			});
 
 			return data;
 		} catch (error) {
-			unstable_batchedUpdates(() => {
-				setError(error);
-				setIsLoading(false);
+			dispatch({
+				type: 'error',
+				error
 			});
 
 			throw error;
 		}
 	}, useDeepDependencies([client, query, options]));
 
-	return {mutate, data, isLoading, error};
+	return {mutate, data, error, isLoading};
 };
