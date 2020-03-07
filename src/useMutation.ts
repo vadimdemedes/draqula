@@ -1,4 +1,4 @@
-import {useReducer, useCallback, Reducer} from 'react';
+import {useReducer, useCallback, useRef, useEffect, Reducer} from 'react';
 import {DocumentNode} from 'graphql';
 import useDraqulaClient from './useDraqulaClient';
 import useDeepDependencies from './useDeepDependencies';
@@ -70,7 +70,22 @@ const initialState = {
 
 export default <T>(query: DocumentNode, options: MutationOptions = defaultMutationOptions): Result<T> => {
 	const client = useDraqulaClient();
-	const [{data, error, isLoading}, dispatch] = useReducer<Reducer<State<T>, Action<T>>>(reducer, initialState);
+	const [{data, error, isLoading}, originalDispatch] = useReducer<Reducer<State<T>, Action<T>>>(reducer, initialState);
+
+	// Disable any state updates after component with this hook is unmounted
+	const isUnmountedRef = useRef(false);
+
+	useEffect(() => {
+		return () => {
+			isUnmountedRef.current = false;
+		};
+	}, []);
+
+	const dispatch = (action: Action<T>): void => {
+		if (isUnmountedRef.current === false) {
+			originalDispatch(action);
+		}
+	};
 
 	const mutate = useCallback(async (variables: object = {}): Promise<T | undefined> => {
 		dispatch({
