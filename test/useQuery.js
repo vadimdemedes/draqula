@@ -913,12 +913,6 @@ test('cache data for different variables', async t => {
 	page = 1;
 	rerender();
 
-	assertQuery(t, result, {
-		data: firstPage,
-		isLoading: false,
-		error: undefined
-	});
-
 	await waitForNextUpdate();
 
 	assertQuery(t, result, {
@@ -929,12 +923,6 @@ test('cache data for different variables', async t => {
 
 	page = 2;
 	rerender();
-
-	assertQuery(t, result, {
-		data: secondPage,
-		isLoading: false,
-		error: undefined
-	});
 
 	await waitForNextUpdate();
 
@@ -1509,6 +1497,177 @@ test('preload query and render with warm cache', async t => {
 
 	assertQuery(t, result, {
 		data: {todos},
+		isLoading: false,
+		error: undefined
+	});
+
+	t.true(nock.isDone());
+});
+
+test('change cache', async t => {
+	const client = new Draqula('http://graph.ql');
+
+	const firstTodos = [
+		{
+			id: 'a',
+			title: 'A'
+		},
+		{
+			id: 'b',
+			title: 'B'
+		}
+	];
+
+	const secondTodos = [
+		{
+			id: 'a',
+			title: 'A'
+		},
+		{
+			id: 'b',
+			title: 'B'
+		},
+		{
+			id: 'c',
+			title: 'C'
+		}
+	];
+
+	const firstRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {todos: firstTodos}
+		});
+
+	const secondRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {todos: secondTodos}
+		});
+
+	const firstQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+	assertQuery(t, firstQuery.result, {
+		data: undefined,
+		isLoading: true,
+		error: undefined
+	});
+
+	await firstQuery.waitForNextUpdate();
+
+	assertQuery(t, firstQuery.result, {
+		data: {todos: firstTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	firstQuery.result.current.setData({todos: secondTodos});
+
+	await firstQuery.waitForNextUpdate();
+
+	assertQuery(t, firstQuery.result, {
+		data: {todos: secondTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	const secondQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+	assertQuery(t, secondQuery.result, {
+		data: {todos: secondTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	await secondQuery.waitForNextUpdate();
+
+	assertQuery(t, secondQuery.result, {
+		data: {todos: secondTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	t.true(nock.isDone());
+});
+
+test('change cache using reducer', async t => {
+	const client = new Draqula('http://graph.ql');
+
+	const firstTodos = [
+		{
+			id: 'a',
+			title: 'A'
+		},
+		{
+			id: 'b',
+			title: 'B'
+		}
+	];
+
+	const secondTodos = [
+		{
+			id: 'a',
+			title: 'A'
+		},
+		{
+			id: 'b',
+			title: 'B'
+		},
+		{
+			id: 'c',
+			title: 'C'
+		}
+	];
+
+	const firstRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {todos: firstTodos}
+		});
+
+	const secondRequest = nock('http://graph.ql')
+		.post('/')
+		.reply(200, {
+			data: {todos: secondTodos}
+		});
+
+	const firstQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+	assertQuery(t, firstQuery.result, {
+		data: undefined,
+		isLoading: true,
+		error: undefined
+	});
+
+	await firstQuery.waitForNextUpdate();
+
+	assertQuery(t, firstQuery.result, {
+		data: {todos: firstTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	firstQuery.result.current.setData(prevData => {
+		t.deepEqual(prevData, {todos: firstTodos});
+		return {todos: secondTodos};
+	});
+
+	await firstQuery.waitForNextUpdate();
+
+	assertQuery(t, firstQuery.result, {
+		data: {todos: secondTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	const secondQuery = renderHook(() => useQuery(TODOS_QUERY), {wrapper: createWrapper(client)});
+	assertQuery(t, secondQuery.result, {
+		data: {todos: secondTodos},
+		isLoading: false,
+		error: undefined
+	});
+
+	await secondQuery.waitForNextUpdate();
+
+	assertQuery(t, secondQuery.result, {
+		data: {todos: secondTodos},
 		isLoading: false,
 		error: undefined
 	});

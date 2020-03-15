@@ -93,7 +93,7 @@ export default class Draqula {
 		return JSON.stringify(variables);
 	}
 
-	private setDataCache(query: DocumentNode, variables: object, data: any): void {
+	setDataCache<T>(query: DocumentNode, variables: object, data: T | undefined): void {
 		if (this.options.cache === false) {
 			return;
 		}
@@ -153,10 +153,6 @@ export default class Draqula {
 						return error2;
 					});
 					throw new GraphQLError(errors);
-				}
-
-				if (options.cache !== false && this.options.cache !== false) {
-					this.setDataCache(query, variables, response.data);
 				}
 
 				return response.data;
@@ -229,7 +225,11 @@ export default class Draqula {
 	}
 
 	async preload<T>(query: DocumentNode, variables: object = {}): Promise<void> {
-		await this.query<T>(query, variables, {});
+		const data = await this.query<T>(query, variables, {});
+
+		if (this.options.cache !== false) {
+			this.setDataCache<T>(query, variables, data);
+		}
 	}
 
 	watchQuery(query: DocumentNode, callback: (queryId: string) => any): () => void {

@@ -1,4 +1,4 @@
-import {useEffect, useRef, useCallback, useReducer, Reducer} from 'react';
+import {useState, useEffect, useRef, useCallback, useReducer, Reducer, Dispatch, SetStateAction} from 'react';
 import {DocumentNode} from 'graphql';
 import AbortController from 'abort-controller';
 import {merge} from 'lodash';
@@ -28,6 +28,7 @@ interface FetchMoreOptions {
 
 interface Result<T> {
 	data: T | undefined;
+	setData: Dispatch<SetStateAction<T | undefined>>;
 	isLoading: boolean;
 	error: NetworkError | GraphQLError | undefined;
 	refetch: () => Promise<void>;
@@ -45,7 +46,7 @@ interface State<T> {
 }
 
 interface Action<T> {
-	type: 'fetch' | 'success' | 'error' | 'reset' | 'fetch-more' | 'fetch-more-success' | 'fetch-more-done';
+	type: 'fetch' | 'success' | 'error' | 'reset' | 'fetch-more' | 'fetch-more-success' | 'fetch-more-done' | 'set-data';
 	data?: T;
 	error?: NetworkError | GraphQLError | undefined;
 }
@@ -107,21 +108,47 @@ const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
 		};
 	}
 
+	if (action.type === 'set-data') {
+		return {
+			...state,
+			data: action.data
+		};
+	}
+
 	return state;
 };
 
 export default <T>(query: DocumentNode, variables: object = {}, options: QueryOptions = {}): Result<T> => {
 	const client = useDraqulaClient();
-	const cachedData = useDataCache<T>(query, variables);
+	const [cache, setCache] = useDataCache<T>(query, variables);
 	const [{data, error, isLoading, isFetchingMore}, dispatch] = useReducer<Reducer<State<T>, Action<T>>>(reducer, {
-		data: cachedData,
+		data: cache,
 		error: undefined,
-		isLoading: cachedData === undefined,
+		isLoading: cache === undefined,
 		isFetchingMore: false
 	});
 
+	const [customData, setCustomData] = useState(cache);
+
+	useEffect(() => {
+		if (options.cache !== false) {
+			setCustomData(data);
+		}
+	}, [data, options.cache]);
+
+	useEffect(() => {
+		if (options.cache !== false) {
+			dispatch({
+				type: 'set-data',
+				data: customData
+			});
+
+			setCache(customData);
+		}
+	}, [customData, options.cache]);
+
 	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
-		if (!refetch && cachedData === undefined) {
+		if (!refetch && cache === undefined) {
 			dispatch({
 				type: 'fetch'
 			});
@@ -152,7 +179,7 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 				error
 			});
 		}
-	}, useDeepDependencies([client, query, variables, options, cachedData]));
+	}, useDeepDependencies([client, query, variables, options, cache]));
 
 	// `refetch` can be executed manually any number of times, so we have to manually
 	// take care of canceling the last refetch request by maintaing reference to the last abort controller
@@ -208,7 +235,7 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 	useEffect(() => {
 		dispatch({
 			type: 'reset',
-			data: cachedData
+			data: cache
 		});
 
 		const abortController = new AbortController();
@@ -219,5 +246,5 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 
 	useEffect(() => client.watchQuery(query, refetch), [client, query, refetch]);
 
-	return {data, error, isLoading, fetchMore, isFetchingMore, refetch};
+	return {data, setData: setCustomData, error, isLoading, fetchMore, isFetchingMore, refetch};
 };
