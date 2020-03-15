@@ -4,7 +4,6 @@ import AbortController from 'abort-controller';
 import {merge} from 'lodash';
 import useDraqulaClient from './useDraqulaClient';
 import useDataCache from './useDataCache';
-import useDeepDependencies from './useDeepDependencies';
 import usePageFocus from './usePageFocus';
 import NetworkError from './lib/network-error';
 import GraphQLError from './lib/graphql-error';
@@ -15,11 +14,6 @@ interface QueryOptions {
 	readonly retry?: boolean;
 	readonly cache?: boolean;
 	readonly refetchOnFocus?: boolean;
-}
-
-interface FetchOptions {
-	readonly refetch?: boolean;
-	readonly signal?: AbortSignal;
 }
 
 interface FetchMoreOptions {
@@ -147,17 +141,65 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 		}
 	}, [customData, options.cache]);
 
-	const fetch = useCallback(async ({refetch = false, signal}: FetchOptions): Promise<void> => {
-		if (!refetch && cache === undefined) {
-			dispatch({
-				type: 'fetch'
-			});
+	useEffect(() => {
+		const abortController = new AbortController();
+
+		const fetch = async (): Promise<void> => {
+			if (cache === undefined) {
+				dispatch({
+					type: 'fetch'
+				});
+			}
+
+			try {
+				const data = await client.query<T>(query, variables, {
+					...options,
+					signal: abortController.signal
+				});
+
+				dispatch({
+					type: 'success',
+					data
+				});
+			} catch (error) {
+				// `AbortError` is thrown when request is canceled
+				if (error.name === 'AbortError') {
+					return;
+				}
+
+				dispatch({
+					type: 'error',
+					error
+				});
+			}
+		};
+
+		dispatch({
+			type: 'reset',
+			data: cache
+		});
+
+		fetch();
+
+		return () => {
+			abortController.abort();
+		};
+	}, [client, query, JSON.stringify(variables), JSON.stringify(options), cache]);
+
+	// `refetch` can be executed manually any number of times, so we have to manually
+	// take care of canceling the last refetch request by maintaing reference to the last abort controller
+	const refetchAbortControllerRef = useRef<AbortController>();
+	const refetch = useCallback(async () => {
+		if (refetchAbortControllerRef.current) {
+			refetchAbortControllerRef.current.abort();
 		}
+
+		refetchAbortControllerRef.current = new AbortController();
 
 		try {
 			const data = await client.query<T>(query, variables, {
 				...options,
-				signal
+				signal: refetchAbortControllerRef.current.signal
 			});
 
 			dispatch({
@@ -170,32 +212,9 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 				return;
 			}
 
-			if (refetch) {
-				throw error;
-			}
-
-			dispatch({
-				type: 'error',
-				error
-			});
+			throw error;
 		}
-	}, useDeepDependencies([client, query, variables, options, cache]));
-
-	// `refetch` can be executed manually any number of times, so we have to manually
-	// take care of canceling the last refetch request by maintaing reference to the last abort controller
-	const refetchAbortControllerRef = useRef<AbortController>();
-	const refetch = useCallback(() => {
-		if (refetchAbortControllerRef.current) {
-			refetchAbortControllerRef.current.abort();
-		}
-
-		refetchAbortControllerRef.current = new AbortController();
-
-		return fetch({
-			refetch: true,
-			signal: refetchAbortControllerRef.current.signal
-		});
-	}, [fetch]);
+	}, [client, query, JSON.stringify(variables), JSON.stringify(options)]);
 
 	usePageFocus(refetch as () => void, {
 		isEnabled: typeof options.refetchOnFocus === 'boolean' ? options.refetchOnFocus : true
@@ -229,22 +248,13 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 				});
 			}
 		},
-		useDeepDependencies([client, query, variables, options, data])
+		[client, query, JSON.stringify(variables), JSON.stringify(options), data]
 	);
 
 	useEffect(() => {
-		dispatch({
-			type: 'reset',
-			data: cache
-		});
-
-		const abortController = new AbortController();
-		fetch({signal: abortController.signal});
-
-		return () => abortController.abort();
-	}, [fetch]);
-
-	useEffect(() => client.watchQuery(query, refetch), [client, query, refetch]);
+		const unsubscribe = client.watchQuery(query, refetch);
+		return unsubscribe;
+	}, [client, query, refetch]);
 
 	return {data, setData: setCustomData, error, isLoading, fetchMore, isFetchingMore, refetch};
 };

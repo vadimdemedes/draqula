@@ -1,7 +1,6 @@
 import {useReducer, useCallback, useRef, useEffect, Reducer} from 'react';
 import {DocumentNode} from 'graphql';
 import useDraqulaClient from './useDraqulaClient';
-import useDeepDependencies from './useDeepDependencies';
 import NetworkError from './lib/network-error';
 import GraphQLError from './lib/graphql-error';
 
@@ -87,29 +86,32 @@ export default <T>(query: DocumentNode, options: MutationOptions = defaultMutati
 		}
 	};
 
-	const mutate = useCallback(async (variables: object = {}): Promise<T | undefined> => {
-		dispatch({
-			type: 'mutate'
-		});
-
-		try {
-			const data = await client.mutate<T>(query, variables, options);
-
+	const mutate = useCallback(
+		async (variables: object = {}): Promise<T | undefined> => {
 			dispatch({
-				type: 'success',
-				data
+				type: 'mutate'
 			});
 
-			return data;
-		} catch (error) {
-			dispatch({
-				type: 'error',
-				error
-			});
+			try {
+				const data = await client.mutate<T>(query, variables, options);
 
-			throw error;
-		}
-	}, useDeepDependencies([client, query, options]));
+				dispatch({
+					type: 'success',
+					data
+				});
+
+				return data;
+			} catch (error) {
+				dispatch({
+					type: 'error',
+					error
+				});
+
+				throw error;
+			}
+		},
+		[client, query, JSON.stringify(options)]
+	);
 
 	return {mutate, data, error, isLoading};
 };
