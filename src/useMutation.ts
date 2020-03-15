@@ -10,7 +10,7 @@ interface MutationOptions {
 }
 
 interface Result<T> {
-	mutate: (variables?: object) => Promise<T | undefined>;
+	mutate: (variables?: object) => Promise<T>;
 	data: T | undefined;
 	isLoading: boolean;
 	error: NetworkError | GraphQLError | undefined;
@@ -87,7 +87,7 @@ export default <T>(query: DocumentNode, options: MutationOptions = defaultMutati
 	};
 
 	const mutate = useCallback(
-		async (variables: object = {}): Promise<T | undefined> => {
+		async (variables: object = {}): Promise<T> => {
 			dispatch({
 				type: 'mutate'
 			});
