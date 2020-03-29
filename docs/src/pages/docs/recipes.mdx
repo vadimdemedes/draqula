@@ -1,0 +1,38 @@
+---
+title: Recipes
+path: /docs/recipes
+position: 6
+---
+
+# Recipes
+
+## React Native and TypeScript
+
+Draqula supports React Native out-of-the-box, but there are a few extra steps
+needed if you're using TypeScript.
+
+- Make sure you are using Draqula v0.5.3 or higher
+- Update TypeScript config to include `AsyncIterableIterator` type
+
+Add `esnext.asynciterable` to `compilerOptions.lib` in `tsconfig.json`:
+
+```json
+{
+	"compilerOptions": {
+		"lib": ["es6", "esnext.asynciterable"]
+	}
+}
+```
+
+- Patch `ky` to not include DOM types
+
+First, install [`patch-package`](https://npmjs.com/package/patch-package) and
+set up a `postinstall` script according to instructions in its readme.
+
+Afterwards, download a `ky` patch (compatible with `ky@0.12.0` as of this writing) and put it in `patches` folder:
+
+```bash
+$ mkdir patches
+$ curl https://draqulajs.com/ky+0.12.0.patch > patches/ky+0.12.0.patch
+$ npx patch-package
+```
