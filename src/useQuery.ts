@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef, useCallback, useReducer, Reducer, Dispatch, SetStateAction} from 'react';
+import {useState, useEffect, useRef, useCallback, Dispatch, SetStateAction} from 'react';
 import {DocumentNode} from 'graphql';
 import AbortController from 'abort-controller';
 import {merge} from 'lodash';
@@ -34,89 +34,18 @@ const defaultFetchMoreOptions = {merge: defaultMerge};
 
 interface State<T> {
 	data: T | undefined;
+	cache: T | undefined;
 	error: NetworkError | GraphQLError | undefined;
 	isLoading: boolean;
 	isFetchingMore: boolean;
 }
 
-interface Action<T> {
-	type: 'fetch' | 'success' | 'error' | 'reset' | 'fetch-more' | 'fetch-more-success' | 'fetch-more-done' | 'set-data';
-	data?: T;
-	error?: NetworkError | GraphQLError | undefined;
-}
-
-const reducer = <T>(state: State<T>, action: Action<T>): State<T> => {
-	if (action.type === 'fetch') {
-		return {
-			...state,
-			error: undefined,
-			isLoading: true
-		};
-	}
-
-	if (action.type === 'success') {
-		return {
-			...state,
-			data: action.data,
-			error: undefined,
-			isLoading: false
-		};
-	}
-
-	if (action.type === 'error') {
-		return {
-			...state,
-			data: undefined,
-			error: action.error,
-			isLoading: false
-		};
-	}
-
-	if (action.type === 'reset') {
-		return {
-			data: action.data,
-			error: undefined,
-			isLoading: !action.data,
-			isFetchingMore: false
-		};
-	}
-
-	if (action.type === 'fetch-more') {
-		return {
-			...state,
-			isFetchingMore: true
-		};
-	}
-
-	if (action.type === 'fetch-more-success') {
-		return {
-			...state,
-			data: action.data
-		};
-	}
-
-	if (action.type === 'fetch-more-done') {
-		return {
-			...state,
-			isFetchingMore: false
-		};
-	}
-
-	if (action.type === 'set-data') {
-		return {
-			...state,
-			data: action.data
-		};
-	}
-
-	return state;
-};
-
 export default <T>(query: DocumentNode, variables: object = {}, options: QueryOptions = {}): Result<T> => {
 	const client = useDraqulaClient();
 	const [cache, setCache] = useDataCache<T>(query, variables);
-	const [{data, error, isLoading, isFetchingMore}, dispatch] = useReducer<Reducer<State<T>, Action<T>>>(reducer, {
+	const [{data, error, isLoading, isFetchingMore}, setState] = useState<State<T>>({
 		data: cache,
+		cache,
 		error: undefined,
 		isLoading: cache === undefined,
 		isFetchingMore: false
@@ -132,10 +61,11 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 
 	useEffect(() => {
 		if (options.cache !== false) {
-			dispatch({
-				type: 'set-data',
-				data: customData
-			});
+			setState(previousState => ({
+				...previousState,
+				data: customData,
+				cache: customData
+			}));
 
 			setCache(customData);
 		}
@@ -146,9 +76,11 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 
 		const fetch = async (): Promise<void> => {
 			if (cache === undefined) {
-				dispatch({
-					type: 'fetch'
-				});
+				setState(previousState => ({
+					...previousState,
+					error: undefined,
+					isLoading: true
+				}));
 			}
 
 			try {
@@ -157,27 +89,34 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 					signal: abortController.signal
 				});
 
-				dispatch({
-					type: 'success',
-					data
-				});
+				setState(previousState => ({
+					...previousState,
+					data,
+					error: undefined,
+					isLoading: false
+				}));
 			} catch (error) {
 				// `AbortError` is thrown when request is canceled
 				if (error.name === 'AbortError') {
 					return;
 				}
 
-				dispatch({
-					type: 'error',
-					error
-				});
+				setState(previousState => ({
+					...previousState,
+					data: undefined,
+					error,
+					isLoading: false
+				}));
 			}
 		};
 
-		dispatch({
-			type: 'reset',
-			data: cache
-		});
+		setState(previousState => ({
+			...previousState,
+			data: cache,
+			error: undefined,
+			isLoading: !cache,
+			isFetchingMore: false
+		}));
 
 		fetch();
 
@@ -202,10 +141,11 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 				signal: refetchAbortControllerRef.current.signal
 			});
 
-			dispatch({
-				type: 'success',
-				data
-			});
+			setState(previousState => ({
+				...previousState,
+				data,
+				error: undefined
+			}));
 		} catch (error) {
 			// `AbortError` is thrown when request is canceled
 			if (error.name === 'AbortError') {
@@ -222,33 +162,39 @@ export default <T>(query: DocumentNode, variables: object = {}, options: QueryOp
 
 	const fetchMore = useCallback(
 		async (overrideVariables: object, fetchMoreOptions: FetchMoreOptions = defaultFetchMoreOptions): Promise<void> => {
-			dispatch({
-				type: 'fetch-more'
-			});
+			setState(previousState => ({
+				...previousState,
+				isFetchingMore: true
+			}));
 
 			try {
 				const nextData = await client.query<T>(query, merge({}, variables, overrideVariables), options);
 
-				if (data === undefined) {
-					dispatch({
-						type: 'fetch-more-success',
-						data: nextData
-					});
-				}
+				setState(previousState => {
+					if (previousState.data === undefined) {
+						return {
+							...previousState,
+							data: nextData
+						};
+					}
 
-				if (data !== undefined && nextData !== undefined) {
-					dispatch({
-						type: 'fetch-more-success',
-						data: fetchMoreOptions.merge<T>(data, nextData)
-					});
-				}
-			} finally {
-				dispatch({
-					type: 'fetch-more-done'
+					if (previousState.data !== undefined && nextData !== undefined) {
+						return {
+							...previousState,
+							data: fetchMoreOptions.merge<T>(previousState.data, nextData)
+						};
+					}
+
+					return previousState;
 				});
+			} finally {
+				setState(previousState => ({
+					...previousState,
+					isFetchingMore: false
+				}));
 			}
 		},
-		[client, query, JSON.stringify(variables), JSON.stringify(options), data]
+		[client, query, JSON.stringify(variables), JSON.stringify(options)]
 	);
 
 	useEffect(() => {
